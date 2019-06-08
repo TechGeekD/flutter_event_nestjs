@@ -9,4 +9,8 @@ export interface IUser extends Document {
 	lastName?: string;
 	phoneNo?: number;
 	address?: string;
+	roles: string[];
+	toAuthJSON: () => {};
+	toProfileJSON: () => {};
+	toValidateUserJSON: () => {};
 }

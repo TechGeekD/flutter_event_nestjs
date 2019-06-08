@@ -14,42 +14,43 @@ import { CreateUserDTO } from "./dto/create-user.dto";
 import { UpdateUserDTO } from "./dto/update-user.dto";
 import { ListAllEntities } from "./dto/list-all-entities.dto";
 
-import { AuthGuard } from "../../guard/auth.guard";
-import { RolesGuard } from "../../guard/roles.guard";
-import { Roles } from "../../guard/roles.decorator";
+import { AuthGuard } from "guard/auth.guard";
+import { RolesGuard } from "guard/roles.guard";
+import { RType, Roles } from "guard/roles.decorator";
+
 import { UserService } from "./user.service";
 
 @Controller("user")
-// @UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, RolesGuard)
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Post()
-	@Roles("admin")
+	@Roles(RType.ADMIN)
 	create(@Body() createUserDTO: CreateUserDTO) {
 		return this.userService.setNewUser(createUserDTO);
 	}
 
 	@Get()
-	@Roles("admin")
+	@Roles(RType.ADMIN, RType.USER)
 	findAll(@Query() query: ListAllEntities) {
 		return this.userService.getAllUser();
 	}
 
 	@Get(":id")
-	@Roles("admin")
+	@Roles(RType.ADMIN, RType.USER)
 	findOne(@Param("id") id: string) {
 		return this.userService.getUserById(id);
 	}
 
 	@Put(":id")
-	@Roles("admin")
+	@Roles(RType.ADMIN)
 	update(@Param("id") id: string, @Body() updateUserDTO: UpdateUserDTO) {
 		return this.userService.updateUser(id, updateUserDTO);
 	}
 
 	@Delete(":id")
-	@Roles("admin")
+	@Roles(RType.ADMIN)
 	remove(@Param("id") id: string) {
 		return this.userService.deleteUser(id);
 	}

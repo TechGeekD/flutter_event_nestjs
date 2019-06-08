@@ -39,4 +39,8 @@ export class UpdateUserDTO {
 	@IsOptional()
 	@IsString()
 	readonly address?: string;
+
+	@IsOptional()
+	@IsString()
+	readonly roles?: string[];
 }

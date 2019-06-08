@@ -3,11 +3,11 @@ import { JwtService } from "@nestjs/jwt";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
-import { UserService } from "../user/user.service";
+import { UserService } from "api/user/user.service";
 import { UserCredsDTO } from "./dto/user-creds.dto";
 
 import { IJwtPayload } from "./interfaces/jwt-payload.interface";
-import { IUser } from "../user/interfaces/user.interface";
+import { IUser } from "api/user/interfaces/user.interface";
 
 @Injectable()
 export class AuthService {
@@ -18,31 +18,38 @@ export class AuthService {
 	) {}
 
 	async ValidateUser(payload: IJwtPayload): Promise<any> {
-		return await this.usersService.getUserById(payload.id);
+		const foundUser: IUser = await this.userModel.findById(payload.id);
+
+		return foundUser.toValidateUserJSON();
 	}
 
 	async AuthenticateUser(userCreds: UserCredsDTO) {
-		const user: IUser = await this.userModel.findOne({
+		const authedUser: IUser = await this.userModel.findOne({
 			username: userCreds.username,
 			password: userCreds.password,
 		});
 
-		const jwtPayload: IJwtPayload = {
-			id: user.id,
-			username: user.username,
-			email: user.email,
-		};
+		if (authedUser) {
+			const userJson = authedUser.toAuthJSON();
+			await authedUser.save();
 
-		if (user) {
-			const token = this.jwtService.sign(jwtPayload);
-			this.usersService.updateUser(user.id, { token });
-			return { ...jwtPayload, token };
-		} else {
-			throw new UnauthorizedException();
+			return userJson;
 		}
+
+		throw new UnauthorizedException();
 	}
 
-	async UnAuthenticateUser(id, token) {
+	async RegisterUser(userCredsDTO: UserCredsDTO) {
+		const createdUser = new this.userModel(userCredsDTO);
+
+		const userJson = createdUser.toAuthJSON();
+		await createdUser.save();
+
+		return userJson;
+	}
+
+	async UnAuthenticateUser(token) {
+		const id = this.jwtService.verify(token).id;
 		const user: IUser = await this.userModel.findOneAndUpdate(
 			{ _id: id, token },
 			{ token: null },

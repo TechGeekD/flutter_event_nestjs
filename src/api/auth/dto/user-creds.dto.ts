@@ -10,8 +10,4 @@ export class UserCredsDTO {
 
 	@IsEmail()
 	readonly email: string;
-
-	@IsOptional()
-	@IsString({ each: true })
-	readonly roles: string[];
 }

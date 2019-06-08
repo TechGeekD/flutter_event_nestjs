@@ -1,7 +1,7 @@
 import { UpdateUserDTO } from "./dto/update-user.dto";
 import { CreateUserDTO } from "./dto/create-user.dto";
 import { Model } from "mongoose";
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
 import { IUser } from "./interfaces/user.interface";
@@ -14,42 +14,60 @@ export class UserService {
 		const allUser = await this.userModel.find().exec();
 
 		return allUser.map(user => {
-			user = user.toObject();
-
-			Reflect.deleteProperty(user, "password");
-			Reflect.deleteProperty(user, "__v");
-			Reflect.deleteProperty(user, "token");
-
-			return user;
+			return user.toProfileJSON();
 		});
 	}
 
 	async findOneByEmail(userCreds) {
-		return await this.userModel.findOne({ email: userCreds.email });
+		const foundUser = await this.userModel.findOne({ email: userCreds.email });
+
+		if (!foundUser) {
+			throw new NotFoundException("Error User Not Found");
+		}
+
+		return foundUser.toProfileJSON();
 	}
 
 	async getUserById(id: string) {
-		return await this.userModel.findById(id);
+		const foundUser = await this.userModel.findById(id);
+
+		if (!foundUser) {
+			throw new NotFoundException("Error User Not Found");
+		}
+
+		return foundUser.toProfileJSON();
 	}
 
 	async setNewUser(createUserDTO: CreateUserDTO) {
 		const createdUser = new this.userModel(createUserDTO);
-		return await createdUser.save();
+		await createdUser.save();
+
+		return createdUser.toProfileJSON();
 	}
 
 	async updateUser(id: string, updateUserDTO: UpdateUserDTO) {
-		const fields = {
-			password: 0,
-			__v: 0,
-		};
+		const updatedUser = await this.userModel.findByIdAndUpdate(
+			id,
+			updateUserDTO,
+			{
+				new: true,
+			},
+		);
 
-		return await this.userModel.findByIdAndUpdate(id, updateUserDTO, {
-			fields,
-			new: true,
-		});
+		if (!updatedUser) {
+			throw new NotFoundException("Error User Not Found");
+		}
+
+		return updatedUser.toProfileJSON();
 	}
 
 	async deleteUser(id: any) {
-		return await this.userModel.findByIdAndDelete(id);
+		const deletedUser = await this.userModel.findByIdAndDelete(id);
+
+		if (!deletedUser) {
+			throw new NotFoundException("Error User Not Found");
+		}
+
+		return deletedUser.toProfileJSON();
 	}
 }
