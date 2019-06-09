@@ -1,8 +1,22 @@
-import { ExtractJwt } from "passport-jwt";
-import { AuthService } from "./auth.service";
-import { Controller, Post, Body, ValidationPipe, Req } from "@nestjs/common";
+import {
+	Controller,
+	Get,
+	Post,
+	Body,
+	ValidationPipe,
+	Headers,
+	UseGuards,
+} from "@nestjs/common";
+
+import { Roles, RType } from "decorators/roles.decorator";
+import { CurrentUser } from "decorators/user.decorator";
 
 import { UserCredsDTO } from "./dto/user-creds.dto";
+
+import { AuthService } from "./auth.service";
+
+import { AuthGuard } from "guard/auth.guard";
+import { RolesGuard } from "guard/roles.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -18,9 +32,11 @@ export class AuthController {
 		return this.authService.RegisterUser(userCreds);
 	}
 
-	@Post("logout")
-	unAuthenticateUser(@Req() req) {
-		const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-		return this.authService.UnAuthenticateUser(token);
+	@Get("logout")
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles(RType.ADMIN, RType.USER)
+	unAuthenticateUser(@CurrentUser("id") id, @Headers() headers) {
+		const token = headers.authorization.split(" ")[1];
+		return this.authService.UnAuthenticateUser(id, token);
 	}
 }

@@ -10,13 +10,14 @@ import {
 	UseGuards,
 } from "@nestjs/common";
 
+import { RType, Roles } from "decorators/roles.decorator";
+
 import { CreateUserDTO } from "./dto/create-user.dto";
 import { UpdateUserDTO } from "./dto/update-user.dto";
 import { ListAllEntities } from "./dto/list-all-entities.dto";
 
 import { AuthGuard } from "guard/auth.guard";
 import { RolesGuard } from "guard/roles.guard";
-import { RType, Roles } from "guard/roles.decorator";
 
 import { UserService } from "./user.service";
 

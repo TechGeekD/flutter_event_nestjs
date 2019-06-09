@@ -2,7 +2,7 @@ import * as mongoose from "mongoose";
 import { JwtService } from "@nestjs/jwt";
 
 import config from "config";
-import { RType } from "guard/roles.decorator";
+import { RType } from "decorators/roles.decorator";
 
 export const UserSchema = new mongoose.Schema(
 	{
@@ -11,7 +11,7 @@ export const UserSchema = new mongoose.Schema(
 		email: { type: String, required: true },
 		firstName: String,
 		lastName: String,
-		phoneNo: Number,
+		phoneNo: String,
 		address: String,
 		token: String,
 		roles: { type: [String], default: [RType.USER] },
@@ -56,6 +56,10 @@ UserSchema.methods.generateJWT = function() {
 };
 
 UserSchema.methods.toValidateUserJSON = function() {
+	if (!this.token) {
+		return null;
+	}
+
 	return {
 		id: this._id,
 		username: this.username,

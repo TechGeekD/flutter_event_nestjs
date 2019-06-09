@@ -34,7 +34,7 @@ export class UpdateUserDTO {
 
 	@IsOptional()
 	@IsNumber()
-	readonly phoneNo?: number;
+	readonly phoneNo?: string;
 
 	@IsOptional()
 	@IsString()

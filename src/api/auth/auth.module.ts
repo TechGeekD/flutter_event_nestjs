@@ -10,6 +10,7 @@ import { AuthService } from "./auth.service";
 import { JwtStrategy } from "./jwt.strategy";
 
 import { UserModule } from "api/user/user.module";
+import { EventsModule } from "api/events/events.module";
 
 @Module({
 	imports: [
@@ -21,9 +22,10 @@ import { UserModule } from "api/user/user.module";
 			},
 		}),
 		UserModule,
+		EventsModule,
 	],
 	controllers: [AuthController],
 	providers: [AuthService, JwtStrategy],
-	exports: [PassportModule, AuthService],
+	exports: [UserModule, EventsModule, PassportModule, AuthService],
 })
 export class AuthModule {}

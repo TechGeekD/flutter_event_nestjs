@@ -12,6 +12,7 @@
     "paths": {
       "api/*": ["api/*"],
       "config/*": ["config/*"],
+      "decorators/*": ["decorators/*"],
       "guard/*": ["guard/*"]
     },
     "incremental": true

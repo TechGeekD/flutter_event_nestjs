@@ -1,9 +1,7 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
-import { UserService } from "api/user/user.service";
 import { UserCredsDTO } from "./dto/user-creds.dto";
 
 import { IJwtPayload } from "./interfaces/jwt-payload.interface";
@@ -11,11 +9,7 @@ import { IUser } from "api/user/interfaces/user.interface";
 
 @Injectable()
 export class AuthService {
-	constructor(
-		private readonly usersService: UserService,
-		private readonly jwtService: JwtService,
-		@InjectModel("User") private readonly userModel: Model<IUser>,
-	) {}
+	constructor(@InjectModel("User") private readonly userModel: Model<IUser>) {}
 
 	async ValidateUser(payload: IJwtPayload): Promise<any> {
 		const foundUser: IUser = await this.userModel.findById(payload.id);
@@ -48,8 +42,7 @@ export class AuthService {
 		return userJson;
 	}
 
-	async UnAuthenticateUser(token) {
-		const id = this.jwtService.verify(token).id;
+	async UnAuthenticateUser(id, token) {
 		const user: IUser = await this.userModel.findOneAndUpdate(
 			{ _id: id, token },
 			{ token: null },
