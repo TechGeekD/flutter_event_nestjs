@@ -18,14 +18,15 @@ export class AuthService {
 	}
 
 	async AuthenticateUser(userCreds: UserCredsDTO) {
-		const authedUser: IUser = await this.userModel.findOne({
+		const authUser: IUser = await this.userModel.findOne({
 			username: userCreds.username,
-			password: userCreds.password,
 		});
 
-		if (authedUser) {
-			const userJson = authedUser.toAuthJSON();
-			await authedUser.save();
+		const validPassword = authUser.validatePassword(userCreds.password);
+
+		if (validPassword) {
+			const userJson = authUser.toAuthJSON();
+			await authUser.save();
 
 			return userJson;
 		}
@@ -35,7 +36,7 @@ export class AuthService {
 
 	async RegisterUser(userCredsDTO: UserCredsDTO) {
 		const createdUser = new this.userModel(userCredsDTO);
-
+		await createdUser.setPassword();
 		const userJson = createdUser.toAuthJSON();
 		await createdUser.save();
 

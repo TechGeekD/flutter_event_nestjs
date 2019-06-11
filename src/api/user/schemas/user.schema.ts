@@ -1,5 +1,7 @@
 import * as mongoose from "mongoose";
 import { JwtService } from "@nestjs/jwt";
+import { randomBytes } from "crypto";
+import * as argon2 from "argon2";
 
 import config from "config";
 import { RType } from "decorators/roles.decorator";
@@ -8,6 +10,7 @@ export const UserSchema = new mongoose.Schema(
 	{
 		username: { type: String, required: true },
 		password: { type: String, required: true },
+		salt: { type: String, required: true },
 		email: { type: String, required: true },
 		firstName: String,
 		lastName: String,
@@ -21,22 +24,18 @@ export const UserSchema = new mongoose.Schema(
 	},
 );
 
-UserSchema.methods.validPassword = function(password) {
-	// ToDo: enable password encryption
-	// let hash = crypto
-	// 	.pbkdf2Sync(password, this.salt, 10000, 512, "sha512")
-	// 	.toString("hex");
-	// return this.hash === hash;
-	return this.password === password;
+UserSchema.methods.validatePassword = async function(password) {
+	const validPassword = await argon2.verify(this.password, password);
+
+	return validPassword;
 };
 
-UserSchema.methods.setPassword = function(password) {
-	// ToDo: enable password encryption
-	// this.salt = crypto.randomBytes(16).toString("hex");
-	// this.hash = crypto
-	// 	.pbkdf2Sync(password, this.salt, 10000, 512, "sha512")
-	// 	.toString("hex");
-	this.password = password;
+UserSchema.methods.setPassword = async function() {
+	const salt = randomBytes(32);
+	const hashedPassword = await argon2.hash(this.password, { salt });
+
+	this.salt = salt.toString("hex");
+	this.password = hashedPassword;
 };
 
 UserSchema.methods.generateJWT = function() {
