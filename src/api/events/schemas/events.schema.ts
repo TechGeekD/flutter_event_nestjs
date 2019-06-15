@@ -29,6 +29,7 @@ EventsSchema.methods.toResponseJSON = function(createdBy = null) {
 	}
 
 	return {
+		id: this._id,
 		title: this.title,
 		category: this.category,
 		description: this.description,

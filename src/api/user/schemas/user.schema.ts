@@ -69,6 +69,7 @@ UserSchema.methods.toValidateUserJSON = function() {
 
 UserSchema.methods.toAuthJSON = function() {
 	return {
+		id: this._id,
 		username: this.username,
 		firstName: this.firstName,
 		lastName: this.lastName,
@@ -80,6 +81,7 @@ UserSchema.methods.toAuthJSON = function() {
 
 UserSchema.methods.toProfileJSON = function() {
 	return {
+		id: this._id,
 		username: this.username,
 		firstName: this.firstName,
 		lastName: this.lastName,

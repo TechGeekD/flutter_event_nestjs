@@ -7,6 +7,7 @@ import {
 	Headers,
 	UseGuards,
 } from "@nestjs/common";
+import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
 import { Roles, RType } from "decorators/roles.decorator";
 import { CurrentUser } from "decorators/user.decorator";
@@ -18,6 +19,7 @@ import { AuthService } from "./auth.service";
 import { AuthGuard } from "guard/auth.guard";
 import { RolesGuard } from "guard/roles.guard";
 
+@ApiUseTags("Auth")
 @Controller("auth")
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
@@ -33,6 +35,7 @@ export class AuthController {
 	}
 
 	@Get("logout")
+	@ApiBearerAuth()
 	@UseGuards(AuthGuard, RolesGuard)
 	@Roles(RType.ADMIN, RType.USER)
 	unAuthenticateUser(@CurrentUser("id") id, @Headers() headers) {

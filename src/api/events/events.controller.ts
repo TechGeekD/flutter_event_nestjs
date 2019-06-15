@@ -9,6 +9,7 @@ import {
 	Param,
 	UseGuards,
 } from "@nestjs/common";
+import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
 import { CurrentUser } from "decorators/user.decorator";
 
@@ -21,6 +22,8 @@ import { RolesGuard } from "guard/roles.guard";
 import { AuthGuard } from "guard/auth.guard";
 import { Roles, RType } from "decorators/roles.decorator";
 
+@ApiUseTags("Events")
+@ApiBearerAuth()
 @Controller("events")
 @UseGuards(AuthGuard, RolesGuard)
 export class EventsController {

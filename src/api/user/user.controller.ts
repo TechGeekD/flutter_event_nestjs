@@ -9,6 +9,7 @@ import {
 	Query,
 	UseGuards,
 } from "@nestjs/common";
+import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
 import { RType, Roles } from "decorators/roles.decorator";
 
@@ -21,6 +22,8 @@ import { RolesGuard } from "guard/roles.guard";
 
 import { UserService } from "./user.service";
 
+@ApiUseTags("Users")
+@ApiBearerAuth()
 @Controller("user")
 @UseGuards(AuthGuard, RolesGuard)
 export class UserController {
