@@ -12,6 +12,7 @@ import {
 import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
 import { RType, Roles } from "decorators/roles.decorator";
+import { CurrentUser } from "decorators/user.decorator";
 import { BodyExcludes } from "decorators/body-excludes.decorator";
 
 import { CreateUserDTO } from "./dto/create-user.dto";
@@ -38,8 +39,8 @@ export class UserController {
 
 	@Get()
 	@Roles(RType.ADMIN, RType.USER)
-	findAll(@Query() query: ListAllEntities) {
-		return this.userService.getAllUser();
+	findAll(@Query() query: ListAllEntities, @CurrentUser("id") id: string) {
+		return this.userService.getAllUser(id);
 	}
 
 	@Get(":id")

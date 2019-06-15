@@ -10,9 +10,9 @@ import { IUser } from "./interfaces/user.interface";
 export class UserService {
 	constructor(@InjectModel("User") private readonly userModel: Model<IUser>) {}
 
-	async getAllUser() {
+	async getAllUser(id) {
 		const allUser = await this.userModel
-			.find()
+			.find({ _id: { $ne: id } })
 			.populate("roles");
 
 		return allUser.map(user => {
