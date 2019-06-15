@@ -12,6 +12,8 @@ import {
 import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
 import { CurrentUser } from "decorators/user.decorator";
+import { Roles, RType } from "decorators/roles.decorator";
+import { BodyExcludes } from "decorators/body-excludes.decorator";
 
 import { ListAllEntities } from "api/user/dto/list-all-entities.dto";
 import { CreateEventDTO } from "./dto/create-event.dto";
@@ -20,7 +22,6 @@ import { EventsService } from "./events.service";
 
 import { RolesGuard } from "guard/roles.guard";
 import { AuthGuard } from "guard/auth.guard";
-import { Roles, RType } from "decorators/roles.decorator";
 
 @ApiUseTags("Events")
 @ApiBearerAuth()
@@ -63,7 +64,7 @@ export class EventsController {
 	@Roles(RType.ADMIN, RType.USER)
 	update(
 		@Param("id") id: string,
-		@Body() updateEventDTO: CreateEventDTO,
+		@BodyExcludes(["createdBy"]) updateEventDTO: CreateEventDTO,
 		@CurrentUser("id") createdBy,
 	) {
 		return this.eventsService.updateEvent(id, updateEventDTO, createdBy);

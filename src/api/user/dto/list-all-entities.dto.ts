@@ -1,8 +1,9 @@
-import { ApiModelProperty } from "@nestjs/swagger";
-import { IsNumber } from "class-validator";
+import { ApiModelPropertyOptional } from "@nestjs/swagger";
+import { IsNumber, IsOptional } from "class-validator";
 
 export class ListAllEntities {
+	@IsOptional()
 	@IsNumber()
-	@ApiModelProperty()
+	@ApiModelPropertyOptional()
 	readonly limit: number;
 }

@@ -11,6 +11,7 @@ import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
 import { Roles, RType } from "decorators/roles.decorator";
 import { CurrentUser } from "decorators/user.decorator";
+import { BodyExcludes } from "decorators/body-excludes.decorator";
 
 import { UserCredsDTO } from "./dto/user-creds.dto";
 
@@ -30,7 +31,11 @@ export class AuthController {
 	}
 
 	@Post("register")
-	signup(@Body(new ValidationPipe()) userCreds: UserCredsDTO) {
+	signup(
+		@Body(new ValidationPipe())
+		@BodyExcludes(["token", "roles"])
+		userCreds: UserCredsDTO,
+	) {
 		return this.authService.RegisterUser(userCreds);
 	}
 

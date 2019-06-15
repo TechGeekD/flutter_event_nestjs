@@ -11,11 +11,6 @@ export class UpdateUserDTO {
 	@IsOptional()
 	@IsString()
 	@ApiModelPropertyOptional()
-	readonly token?: string;
-
-	@IsOptional()
-	@IsString()
-	@ApiModelPropertyOptional()
 	readonly username?: string;
 
 	@IsOptional()
@@ -48,9 +43,4 @@ export class UpdateUserDTO {
 	@IsString()
 	@ApiModelPropertyOptional()
 	readonly address?: string;
-
-	@IsOptional()
-	@IsString()
-	@ApiModelPropertyOptional()
-	readonly roles?: string[];
 }

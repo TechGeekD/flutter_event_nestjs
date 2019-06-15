@@ -12,6 +12,7 @@ import {
 import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
 import { RType, Roles } from "decorators/roles.decorator";
+import { BodyExcludes } from "decorators/body-excludes.decorator";
 
 import { CreateUserDTO } from "./dto/create-user.dto";
 import { UpdateUserDTO } from "./dto/update-user.dto";
@@ -49,7 +50,11 @@ export class UserController {
 
 	@Put(":id")
 	@Roles(RType.ADMIN)
-	update(@Param("id") id: string, @Body() updateUserDTO: UpdateUserDTO) {
+	update(
+		@Param("id") id: string,
+		@BodyExcludes(["token", "roles", "username", "password", "email"])
+		updateUserDTO: UpdateUserDTO,
+	) {
 		return this.userService.updateUser(id, updateUserDTO);
 	}
 
