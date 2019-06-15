@@ -8,6 +8,7 @@ import {
 	Query,
 	Param,
 	UseGuards,
+	ValidationPipe,
 } from "@nestjs/common";
 import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
@@ -33,7 +34,9 @@ export class EventsController {
 	@Post()
 	@Roles(RType.ADMIN, RType.USER)
 	create(
-		@Body() createEventDTO: CreateEventDTO,
+		@Body(new ValidationPipe())
+		@BodyExcludes(["createdBy"])
+		createEventDTO: CreateEventDTO,
 		@CurrentUser("id") id: string,
 	) {
 		return this.eventsService.createNewEvent(id, createEventDTO);

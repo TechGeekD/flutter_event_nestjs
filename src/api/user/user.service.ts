@@ -11,7 +11,9 @@ export class UserService {
 	constructor(@InjectModel("User") private readonly userModel: Model<IUser>) {}
 
 	async getAllUser() {
-		const allUser = await this.userModel.find().exec();
+		const allUser = await this.userModel
+			.find()
+			.populate("roles");
 
 		return allUser.map(user => {
 			return user.toProfileJSON();

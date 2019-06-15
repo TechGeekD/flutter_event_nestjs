@@ -4,7 +4,6 @@ import { randomBytes } from "crypto";
 import * as argon2 from "argon2";
 
 import config from "config";
-import { RType } from "decorators/roles.decorator";
 
 export const UserSchema = new mongoose.Schema(
 	{
@@ -17,7 +16,12 @@ export const UserSchema = new mongoose.Schema(
 		phoneNo: String,
 		address: String,
 		token: String,
-		roles: { type: [String], default: [RType.USER] },
+		roles: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "Role",
+			},
+		],
 	},
 	{
 		timestamps: true,
@@ -30,7 +34,8 @@ UserSchema.methods.validatePassword = async function(password) {
 	return validPassword;
 };
 
-UserSchema.methods.setPassword = async function() {
+UserSchema.methods.setRoleAndPassword = async function(role) {
+	this.roles = [role];
 	const salt = randomBytes(32);
 	const hashedPassword = await argon2.hash(this.password, { salt });
 
@@ -63,7 +68,7 @@ UserSchema.methods.toValidateUserJSON = function() {
 		id: this._id,
 		username: this.username,
 		email: this.email,
-		roles: this.roles,
+		roles: this.roles.map(role => role.toResponseJSON()),
 	};
 };
 
@@ -76,6 +81,7 @@ UserSchema.methods.toAuthJSON = function() {
 		phoneNo: this.phoneNo,
 		email: this.email,
 		token: this.generateJWT(),
+		roles: this.roles.map(role => role.toResponseJSON()),
 	};
 };
 

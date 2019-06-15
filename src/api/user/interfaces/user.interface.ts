@@ -14,5 +14,5 @@ export interface IUser extends Document {
 	toProfileJSON: () => {};
 	toValidateUserJSON: () => {};
 	validatePassword: (password) => {};
-	setPassword: () => {};
+	setRoleAndPassword: (role) => {};
 }

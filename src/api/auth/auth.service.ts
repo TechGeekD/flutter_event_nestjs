@@ -2,6 +2,8 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
+import { RType } from "decorators/roles.decorator";
+
 import { UserCredsDTO } from "./dto/user-creds.dto";
 
 import { IJwtPayload } from "./interfaces/jwt-payload.interface";
@@ -9,18 +11,25 @@ import { IUser } from "api/user/interfaces/user.interface";
 
 @Injectable()
 export class AuthService {
-	constructor(@InjectModel("User") private readonly userModel: Model<IUser>) {}
+	constructor(
+		@InjectModel("User") private readonly userModel: Model<IUser>,
+		@InjectModel("Role") private readonly roleModel: Model<IUser>,
+	) {}
 
 	async ValidateUser(payload: IJwtPayload): Promise<any> {
-		const foundUser: IUser = await this.userModel.findById(payload.id);
+		const foundUser: IUser = await this.userModel
+			.findById(payload.id)
+			.populate("roles");
 
 		return foundUser.toValidateUserJSON();
 	}
 
 	async AuthenticateUser(userCreds: UserCredsDTO) {
-		const authUser: IUser = await this.userModel.findOne({
-			username: userCreds.username,
-		});
+		const authUser: IUser = await this.userModel
+			.findOne({
+				username: userCreds.username,
+			})
+			.populate("roles");
 
 		const validPassword = authUser.validatePassword(userCreds.password);
 
@@ -36,7 +45,13 @@ export class AuthService {
 
 	async RegisterUser(userCredsDTO: UserCredsDTO) {
 		const createdUser = new this.userModel(userCredsDTO);
-		await createdUser.setPassword();
+		const role = await this.roleModel
+			.findOne({
+				roleName: RType.USER_ROLE_NAME,
+			})
+			.populate("roles");
+
+		await createdUser.setRoleAndPassword(role);
 		const userJson = createdUser.toAuthJSON();
 		await createdUser.save();
 
