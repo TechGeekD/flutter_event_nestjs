@@ -4,7 +4,8 @@ import { Model } from "mongoose";
 
 import { RType } from "decorators/roles.decorator";
 
-import { UserCredsDTO } from "./dto/user-creds.dto";
+import { LoginCredsDTO } from "./dto/login-creds.dto";
+import { RegisterCredsDTO } from "./dto/register-creds.dto";
 
 import { IJwtPayload } from "./interfaces/jwt-payload.interface";
 import { IUser } from "api/user/interfaces/user.interface";
@@ -24,10 +25,10 @@ export class AuthService {
 		return foundUser.toValidateUserJSON();
 	}
 
-	async AuthenticateUser(userCreds: UserCredsDTO) {
+	async AuthenticateUser(userCreds: LoginCredsDTO) {
 		const authUser: IUser = await this.userModel
 			.findOne({
-				username: userCreds.username,
+				$or: [{ username: userCreds.username }, { email: userCreds.email }],
 			})
 			.populate("roles");
 
@@ -43,7 +44,7 @@ export class AuthService {
 		throw new UnauthorizedException();
 	}
 
-	async RegisterUser(userCredsDTO: UserCredsDTO) {
+	async RegisterUser(userCredsDTO: RegisterCredsDTO) {
 		const createdUser = new this.userModel(userCredsDTO);
 		const role = await this.roleModel
 			.findOne({

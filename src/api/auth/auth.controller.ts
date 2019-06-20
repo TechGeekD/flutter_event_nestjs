@@ -13,7 +13,8 @@ import { Roles, RType } from "decorators/roles.decorator";
 import { CurrentUser } from "decorators/user.decorator";
 import { BodyExcludes } from "decorators/body-excludes.decorator";
 
-import { UserCredsDTO } from "./dto/user-creds.dto";
+import { LoginCredsDTO } from "./dto/login-creds.dto";
+import { RegisterCredsDTO } from "./dto/register-creds.dto";
 
 import { AuthService } from "./auth.service";
 
@@ -26,7 +27,7 @@ export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
 	@Post("login")
-	authenticateUser(@Body(new ValidationPipe()) userCreds: UserCredsDTO) {
+	authenticateUser(@Body(new ValidationPipe()) userCreds: LoginCredsDTO) {
 		return this.authService.AuthenticateUser(userCreds);
 	}
 
@@ -34,7 +35,7 @@ export class AuthController {
 	signup(
 		@Body(new ValidationPipe())
 		@BodyExcludes(["token", "roles"])
-		userCreds: UserCredsDTO,
+		userCreds: RegisterCredsDTO,
 	) {
 		return this.authService.RegisterUser(userCreds);
 	}
