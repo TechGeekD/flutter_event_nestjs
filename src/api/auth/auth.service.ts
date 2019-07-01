@@ -32,13 +32,15 @@ export class AuthService {
 			})
 			.populate("roles");
 
-		const validPassword = authUser.validatePassword(userCreds.password);
+		if (authUser) {
+			const validPassword = authUser.validatePassword(userCreds.password);
 
-		if (validPassword) {
-			const userJson = authUser.toAuthJSON();
-			await authUser.save();
+			if (validPassword) {
+				const userJson = authUser.toAuthJSON();
+				await authUser.save();
 
-			return userJson;
+				return userJson;
+			}
 		}
 
 		throw new UnauthorizedException();

@@ -51,7 +51,6 @@ export class CreateEventDTO {
 	@ApiModelProperty()
 	readonly cost: string;
 
-	@IsString()
 	@ApiModelProperty()
 	readonly createdBy: string;
 

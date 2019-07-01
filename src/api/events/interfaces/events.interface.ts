@@ -14,3 +14,9 @@ export interface IEvents extends Document {
 	date: string;
 	toResponseJSON?(id): any;
 }
+
+export interface IEventParticipant extends Document {
+	event: string;
+	participant: string;
+	toResponseJSON(): any;
+}

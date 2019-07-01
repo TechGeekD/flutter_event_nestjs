@@ -3,13 +3,17 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
 import { CreateEventDTO } from "./dto/create-event.dto";
-import { IEvents } from "./interfaces/events.interface";
+import { EventParticipateDTO } from "./dto/event-participate.dto";
+
+import { IEvents, IEventParticipant } from "./interfaces/events.interface";
 
 @Injectable()
 export class EventsService {
 	constructor(
 		@InjectModel("User") private readonly usersModel: Model<IEvents>,
 		@InjectModel("Events") private readonly eventsModel: Model<IEvents>,
+		@InjectModel("EventParticipants")
+		private readonly eventParticipantModel: Model<IEventParticipant>,
 	) {}
 
 	async createNewEvent(id, createEventDTO: CreateEventDTO) {
@@ -22,7 +26,10 @@ export class EventsService {
 	}
 
 	async getAllEvent() {
-		const allEvents = await this.eventsModel.find().populate("createdBy");
+		const allEvents = await this.eventsModel
+			.find()
+			.populate("createdBy")
+			.sort({ createdAt: -1 });
 
 		return allEvents.map(event => {
 			return event.toResponseJSON(null);
@@ -53,6 +60,7 @@ export class EventsService {
 		if (!foundEvent) {
 			throw new NotFoundException("Error Event Not Found");
 		}
+
 		return foundEvent.toResponseJSON(null);
 	}
 
@@ -62,7 +70,7 @@ export class EventsService {
 			.populate("createdBy");
 
 		if (!foundEvent) {
-			throw new NotFoundException("Error Event Not Found");
+			throw new NotFoundException("Error: Can Not Delete This Event");
 		}
 
 		return foundEvent.toResponseJSON(null);
@@ -80,7 +88,7 @@ export class EventsService {
 			.populate("createdBy");
 
 		if (!updatedEvent) {
-			throw new NotFoundException("Error Event Not Found");
+			throw new NotFoundException("Error: Can Not Update This Event");
 		}
 
 		return updatedEvent.toResponseJSON(null);
@@ -92,9 +100,28 @@ export class EventsService {
 			.populate("createdBy");
 
 		if (!deletedEvent) {
-			throw new NotFoundException("Error Event Not Found");
+			throw new NotFoundException("Error: Can Not Delete This Event");
 		}
 
 		return deletedEvent.toResponseJSON(null);
+	}
+
+	async participateEvent(eventParticipantDTO: EventParticipateDTO) {
+		const eventParticipate = new this.eventParticipantModel(
+			eventParticipantDTO,
+		);
+
+		const savedParticipant = await eventParticipate.save();
+		const populatedParticipant = await savedParticipant
+			.populate({
+				path: "eventId",
+				populate: {
+					path: "createdBy",
+				},
+			})
+			.populate("participantId")
+			.execPopulate();
+
+		return populatedParticipant.toResponseJSON();
 	}
 }

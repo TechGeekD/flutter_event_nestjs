@@ -78,4 +78,15 @@ export class EventsController {
 	remove(@Param("id") id: string, @CurrentUser("id") createdBy: string) {
 		return this.eventsService.deleteEvent(id, createdBy);
 	}
+
+	@Post("/participate/:id")
+	@Roles(RType.ADMIN, RType.USER)
+	participateEvent(@Param("id") id: string, @CurrentUser("id") userId: string) {
+		const participant = {
+			eventId: id,
+			participantId: userId,
+		};
+
+		return this.eventsService.participateEvent(participant);
+	}
 }
