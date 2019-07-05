@@ -6,4 +6,9 @@ export class ListAllEntities {
 	@IsNumber()
 	@ApiModelPropertyOptional()
 	readonly limit: number;
+
+	@IsOptional()
+	@IsNumber()
+	@ApiModelPropertyOptional()
+	readonly pageNumber: number;
 }

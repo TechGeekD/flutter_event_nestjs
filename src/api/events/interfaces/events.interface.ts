@@ -12,11 +12,14 @@ export interface IEvents extends Document {
 	cost: string;
 	createdBy: string;
 	date: string;
-	toResponseJSON?(id): any;
+	toResponseJSON?(id?): any;
 }
 
 export interface IEventParticipant extends Document {
 	event: string;
 	participant: string;
-	toResponseJSON(): any;
+	toResponseJSON?(responseType?: {
+		usersEvent?: boolean;
+		eventUsers?: boolean;
+	}): any;
 }

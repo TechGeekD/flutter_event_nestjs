@@ -12,8 +12,8 @@ import { UserModule } from "api/user/user.module";
 @Module({
 	imports: [
 		MongooseModule.forFeature([
-			{ name: "Events", schema: EventsSchema },
-			{ name: "EventParticipants", schema: EventParticipant },
+			{ name: "Event", schema: EventsSchema },
+			{ name: "EventParticipant", schema: EventParticipant },
 		]),
 		UserModule,
 	],

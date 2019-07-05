@@ -44,8 +44,8 @@ export class EventsController {
 
 	@Get()
 	@Roles(RType.ADMIN, RType.USER)
-	findAll(@Query() query: ListAllEntities) {
-		return this.eventsService.getAllEvent();
+	findAll(@Query() query: ListAllEntities, @CurrentUser("id") createdBy: string) {
+		return this.eventsService.getAllEvent(createdBy);
 	}
 
 	@Get("user/:id")
@@ -88,5 +88,23 @@ export class EventsController {
 		};
 
 		return this.eventsService.participateEvent(participant);
+	}
+
+	@Get("/participate/getParticipantOfEvent/:id")
+	@Roles(RType.ADMIN, RType.USER)
+	getParticipantOfEvent(
+		@Param("id") eventId: string,
+		@Query() query: ListAllEntities,
+	) {
+		return this.eventsService.getParticipantOfEvent(eventId, query);
+	}
+
+	@Get("/participate/getEventParticipatedByUser/:id")
+	@Roles(RType.ADMIN, RType.USER)
+	getEventParticipatedByUser(
+		@Param("id") eventId: string,
+		@Query() query: ListAllEntities,
+	) {
+		return this.eventsService.getEventParticipatedByUser(eventId, query);
 	}
 }

@@ -4,7 +4,7 @@ export const EventParticipant = new mongoose.Schema(
 	{
 		eventId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Events",
+			ref: "Event",
 			required: true,
 		},
 		participantId: {
@@ -18,9 +18,27 @@ export const EventParticipant = new mongoose.Schema(
 	},
 );
 
-EventParticipant.methods.toResponseJSON = function() {
-	return {
-		event: this.eventId.toResponseJSON(),
-		participant: this.participantId.toProfileJSON(),
-	};
+EventParticipant.methods.toResponseJSON = function({
+	eventUsers = false,
+	usersEvent = false,
+}: {
+	eventUsers?: boolean;
+	usersEvent?: boolean;
+} = {}) {
+	if (eventUsers) {
+		return {
+			event: this.eventId,
+			participant: this.participantId.toProfileJSON(),
+		};
+	} else if (usersEvent) {
+		return {
+			event: this.eventId.toResponseJSON(),
+			participant: this.participantId,
+		};
+	} else {
+		return {
+			event: this.eventId.toResponseJSON(),
+			participant: this.participantId.toProfileJSON(),
+		};
+	}
 };
