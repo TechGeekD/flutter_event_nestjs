@@ -1,0 +1,1 @@
+web: node -r ./node_modules/ts-node/register -r ./node_modules/tsconfig-paths/register ./src/main.ts

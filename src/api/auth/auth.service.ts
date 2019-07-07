@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+	Injectable,
+	UnauthorizedException,
+	ConflictException,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
@@ -22,7 +26,7 @@ export class AuthService {
 			.findById(payload.id)
 			.populate("roles");
 
-		return foundUser.toValidateUserJSON();
+		return foundUser ? foundUser.toValidateUserJSON() : null;
 	}
 
 	async AuthenticateUser(userCreds: LoginCredsDTO) {
@@ -47,18 +51,26 @@ export class AuthService {
 	}
 
 	async RegisterUser(userCredsDTO: RegisterCredsDTO) {
-		const createdUser = new this.userModel(userCredsDTO);
-		const role = await this.roleModel
-			.findOne({
-				roleName: RType.USER_ROLE_NAME,
-			})
-			.populate("roles");
+		const existUser = await this.userModel.findOne({
+			$or: [{ username: userCredsDTO.username }, { email: userCredsDTO.email }],
+		});
 
-		await createdUser.setRoleAndPassword(role);
-		const userJson = createdUser.toAuthJSON();
-		await createdUser.save();
+		if (!existUser) {
+			const createdUser = new this.userModel(userCredsDTO);
+			const role = await this.roleModel
+				.findOne({
+					roleName: RType.USER_ROLE_NAME,
+				})
+				.populate("roles");
 
-		return userJson;
+			await createdUser.setRoleAndPassword(role);
+			const userJson = createdUser.toAuthJSON();
+			await createdUser.save();
+
+			return userJson;
+		} else {
+			throw new ConflictException();
+		}
 	}
 
 	async UnAuthenticateUser(id, token) {

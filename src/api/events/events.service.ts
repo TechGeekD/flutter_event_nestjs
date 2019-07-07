@@ -1,5 +1,5 @@
 import { Model, Types } from "mongoose";
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, ConflictException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
 import { CreateEventDTO } from "./dto/create-event.dto";
@@ -108,22 +108,30 @@ export class EventsService {
 	}
 
 	async participateEvent(eventParticipantDTO: EventParticipateDTO) {
-		const eventParticipate = new this.eventParticipantModel(
-			eventParticipantDTO,
-		);
+		const existParticipant = this.eventParticipantModel.find({
+			participantId: eventParticipantDTO.participantId,
+		});
 
-		const savedParticipant = await eventParticipate.save();
-		const populatedParticipant = await savedParticipant
-			.populate({
-				path: "eventId",
-				populate: {
-					path: "createdBy",
-				},
-			})
-			.populate("participantId")
-			.execPopulate();
+		if (!existParticipant) {
+			const eventParticipate = new this.eventParticipantModel(
+				eventParticipantDTO,
+			);
 
-		return populatedParticipant.toResponseJSON();
+			const savedParticipant = await eventParticipate.save();
+			const populatedParticipant = await savedParticipant
+				.populate({
+					path: "eventId",
+					populate: {
+						path: "createdBy",
+					},
+				})
+				.populate("participantId")
+				.execPopulate();
+
+			return populatedParticipant.toResponseJSON();
+		} else {
+			throw new ConflictException();
+		}
 	}
 
 	async getParticipantOfEvent(eventId: string, query: ListAllEntities) {

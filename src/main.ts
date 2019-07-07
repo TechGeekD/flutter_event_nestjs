@@ -20,12 +20,13 @@ async function bootstrap() {
 		.setVersion("1.0")
 		.addTag("Misc")
 		.addBearerAuth()
+		.setSchemes("http", "https")
 		.build();
 
 	const document = SwaggerModule.createDocument(app, options);
 	SwaggerModule.setup("api", app, document);
 
-	await app.listen(config.port);
+	await app.listen(process.env.PORT || config.port);
 }
 
 bootstrap();
