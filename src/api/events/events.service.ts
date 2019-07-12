@@ -1,5 +1,9 @@
 import { Model, Types } from "mongoose";
-import { Injectable, NotFoundException, ConflictException } from "@nestjs/common";
+import {
+	Injectable,
+	NotFoundException,
+	ConflictException,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
 import { CreateEventDTO } from "./dto/create-event.dto";
@@ -108,8 +112,11 @@ export class EventsService {
 	}
 
 	async participateEvent(eventParticipantDTO: EventParticipateDTO) {
-		const existParticipant = this.eventParticipantModel.find({
-			participantId: eventParticipantDTO.participantId,
+		const existParticipant = await this.eventParticipantModel.findOne({
+			$and: [
+				{ participantId: eventParticipantDTO.participantId },
+				{ eventId: eventParticipantDTO.eventId },
+			],
 		});
 
 		if (!existParticipant) {
@@ -195,8 +202,14 @@ export class EventsService {
 		participantId: string,
 		query: ListAllEntities,
 	) {
-		const limit = Math.max(1, query.limit || 0);
-		const page = Math.max(1, query.pageNumber || 0);
+		const limit = Math.max(
+			10,
+			isNaN(query.limit) ? 0 : Number(query.limit) || 0,
+		);
+		const page = Math.max(
+			0,
+			isNaN(query.pageNumber) ? 0 : Number(query.pageNumber) - 1 || 0,
+		);
 
 		const allParticipatedEvent = await this.eventParticipantModel
 			.aggregate([{ $match: { participantId: Types.ObjectId(participantId) } }])
