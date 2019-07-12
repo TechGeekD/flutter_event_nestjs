@@ -216,6 +216,7 @@ export class EventsService {
 				foreignField: "_id",
 				as: "event.createdBy",
 			})
+			.unwind("$event.createdBy")
 			.addFields({
 				event: {
 					id: "$event._id",
