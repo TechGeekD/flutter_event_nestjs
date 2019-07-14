@@ -1,6 +1,6 @@
 import * as mongoose from "mongoose";
 
-export const EventParticipant = new mongoose.Schema(
+export const EventParticipantSchema = new mongoose.Schema(
 	{
 		eventId: {
 			type: mongoose.Schema.Types.ObjectId,
@@ -18,7 +18,7 @@ export const EventParticipant = new mongoose.Schema(
 	},
 );
 
-EventParticipant.methods.toResponseJSON = function({
+EventParticipantSchema.methods.toResponseJSON = function({
 	eventUsers = false,
 	usersEvent = false,
 }: {

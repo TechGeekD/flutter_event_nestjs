@@ -5,7 +5,7 @@ import { EventsController } from "./events.controller";
 import { EventsService } from "./events.service";
 
 import { EventsSchema } from "./schemas/events.schema";
-import { EventParticipant } from "./schemas/event-participant.schema";
+import { EventParticipantSchema } from "./schemas/event-participant.schema";
 
 import { UserModule } from "api/user/user.module";
 
@@ -13,7 +13,7 @@ import { UserModule } from "api/user/user.module";
 	imports: [
 		MongooseModule.forFeature([
 			{ name: "Event", schema: EventsSchema },
-			{ name: "EventParticipant", schema: EventParticipant },
+			{ name: "EventParticipant", schema: EventParticipantSchema },
 		]),
 		UserModule,
 	],

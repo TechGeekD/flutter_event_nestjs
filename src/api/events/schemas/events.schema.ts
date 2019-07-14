@@ -38,7 +38,10 @@ EventsSchema.methods.toResponseJSON = function(createdBy = null) {
 		address: this.address,
 		mode: this.mode,
 		cost: this.cost,
-		createdBy: this.createdBy.toProfileJSON(),
+		createdBy:
+			this.createdBy && this.createdBy.toProfileJSON !== undefined
+				? this.createdBy.toProfileJSON()
+				: this.createdBy,
 		date: this.date,
 	};
 };
