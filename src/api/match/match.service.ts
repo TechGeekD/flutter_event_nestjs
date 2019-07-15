@@ -52,7 +52,7 @@ export class MatchService {
 			.populate("participantId");
 
 		if (!allMatch) {
-			throw new NotFoundException("Error Event Not Found");
+			throw new NotFoundException("Error Event Match Not Found");
 		}
 
 		return allMatch.map(match => {
@@ -61,22 +61,21 @@ export class MatchService {
 	}
 
 	async getAllMatchById(eventId: string) {
-		const allMatch = await this.matchModel
-			.find({ eventId });
-			// .populate({
-			// 	path: "eventId",
-			// 	model: "Event",
-			// 	populate: [
-			// 		{
-			// 			path: "createdBy",
-			// 			model: "User",
-			// 		},
-			// 	],
-			// })
-			// .populate("participantId");
+		const allMatch = await this.matchModel.find({ eventId });
+		// .populate({
+		// 	path: "eventId",
+		// 	model: "Event",
+		// 	populate: [
+		// 		{
+		// 			path: "createdBy",
+		// 			model: "User",
+		// 		},
+		// 	],
+		// })
+		// .populate("participantId");
 
 		if (!allMatch) {
-			throw new NotFoundException("Error Event Not Found");
+			throw new NotFoundException("Error Event Match Not Found");
 		}
 
 		return allMatch.map(match => {
@@ -88,39 +87,39 @@ export class MatchService {
 		const createdMatchResult = new this.matchResultModel(createMatchResultDTO);
 		await createdMatchResult.save();
 
-		const populatedMatchResult = await createdMatchResult
-			.populate({
-				path: "matchId",
-				model: "Match",
-				populate: [
-					{
-						path: "eventId",
-						model: "Event",
-						populate: {
-							path: "createdBy",
-							model: "User",
-						},
-					},
-					{
-						path: "participantId",
-						model: "User",
-					},
-				],
-			})
-			.populate("participantId")
-			.populate({
-				path: "eventId",
-				model: "Event",
-				populate: [
-					{
-						path: "createdBy",
-						model: "User",
-					},
-				],
-			})
-			.execPopulate();
+		// const populatedMatchResult = await createdMatchResult
+		// 	.populate({
+		// 		path: "matchId",
+		// 		model: "Match",
+		// 		populate: [
+		// 			{
+		// 				path: "eventId",
+		// 				model: "Event",
+		// 				populate: {
+		// 					path: "createdBy",
+		// 					model: "User",
+		// 				},
+		// 			},
+		// 			{
+		// 				path: "participantId",
+		// 				model: "User",
+		// 			},
+		// 		],
+		// 	})
+		// 	.populate("participantId")
+		// 	.populate({
+		// 		path: "eventId",
+		// 		model: "Event",
+		// 		populate: [
+		// 			{
+		// 				path: "createdBy",
+		// 				model: "User",
+		// 			},
+		// 		],
+		// 	})
+		// 	.execPopulate();
 
-		const matchResultJSON = populatedMatchResult.toResponseJSON();
+		const matchResultJSON = createdMatchResult.toResponseJSON();
 
 		return matchResultJSON;
 	}
@@ -161,7 +160,50 @@ export class MatchService {
 			});
 
 		if (!allMatchResult) {
-			throw new NotFoundException("Error Event Not Found");
+			throw new NotFoundException("Error Event Match Result Not Found");
+		}
+
+		return allMatchResult.map(matchResult => {
+			return matchResult.toResponseJSON();
+		});
+	}
+
+	async getAllMatchResultById(matchId: string) {
+		const allMatchResult = await this.matchResultModel.find({ matchId });
+		// .populate({
+		// 	path: "matchId",
+		// 	model: "Match",
+		// 	populate: [
+		// 		{
+		// 			path: "eventId",
+		// 			model: "Event",
+		// 			populate: [
+		// 				{
+		// 					path: "createdBy",
+		// 					model: "User",
+		// 				},
+		// 			],
+		// 		},
+		// 		{
+		// 			path: "participantId",
+		// 			model: "User",
+		// 		},
+		// 	],
+		// })
+		// .populate("participantId")
+		// .populate({
+		// 	path: "eventId",
+		// 	model: "Event",
+		// 	populate: [
+		// 		{
+		// 			path: "createdBy",
+		// 			model: "User",
+		// 		},
+		// 	],
+		// });
+
+		if (!allMatchResult) {
+			throw new NotFoundException("Error Event Match Result Not Found");
 		}
 
 		return allMatchResult.map(matchResult => {

@@ -60,4 +60,10 @@ export class MatchController {
 	getAllMatchResult() {
 		return this.matchService.getAllMatchResult();
 	}
+
+	@Get("result/:id")
+	@Roles(RType.ADMIN, RType.USER)
+	getAllMatchResultById(@Param("id") matchId: string) {
+		return this.matchService.getAllMatchResultById(matchId);
+	}
 }
