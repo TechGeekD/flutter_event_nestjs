@@ -1,6 +1,19 @@
 import { ApiModelPropertyOptional, ApiModelProperty } from "@nestjs/swagger";
 import { IsString, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
+import { Document } from "mongoose";
+
+export interface IMatchResult extends Document {
+	eventId: string;
+	matchId: string;
+	result: {
+		displayName: string;
+		value: string;
+	};
+	status: string;
+	participantId: string;
+	toResponseJSON?(): any;
+}
 
 class MatchResultDTO {
 	@IsString()

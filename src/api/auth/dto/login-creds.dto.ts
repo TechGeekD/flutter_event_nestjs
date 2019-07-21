@@ -25,3 +25,10 @@ export class LoginCredsDTO {
 	@ApiModelProperty()
 	readonly email: string;
 }
+
+export interface IJwtPayload {
+	id?: string;
+	username: string;
+	email: string;
+	roles?: string[];
+}

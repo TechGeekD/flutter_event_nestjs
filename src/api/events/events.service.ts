@@ -1,3 +1,4 @@
+
 import { Model, Types } from "mongoose";
 import {
 	Injectable,
@@ -6,10 +7,9 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
-import { CreateEventDTO } from "./dto/create-event.dto";
-import { EventParticipateDTO } from "./dto/event-participate.dto";
+import { CreateEventDTO, IEvents } from "./dto/create-event.dto";
+import { EventParticipateDTO, IEventParticipant } from "./dto/event-participate.dto";
 
-import { IEvents, IEventParticipant } from "./interfaces/events.interface";
 import { ListAllEntities } from "api/user/dto/list-all-entities.dto";
 
 @Injectable()
@@ -75,7 +75,7 @@ export class EventsService {
 			.populate("createdBy");
 
 		if (!foundEvent) {
-			throw new NotFoundException("Error: Can Not Delete This Event");
+			throw new NotFoundException("Error: Event Not Found");
 		}
 
 		return foundEvent.toResponseJSON();

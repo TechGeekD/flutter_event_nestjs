@@ -8,11 +8,9 @@ import { Model } from "mongoose";
 
 import { RType } from "decorators/roles.decorator";
 
-import { LoginCredsDTO } from "./dto/login-creds.dto";
+import { LoginCredsDTO, IJwtPayload } from "./dto/login-creds.dto";
 import { RegisterCredsDTO } from "./dto/register-creds.dto";
-
-import { IJwtPayload } from "./interfaces/jwt-payload.interface";
-import { IUser } from "api/user/interfaces/user.interface";
+import { IUser } from "api/user/dto/create-user.dto";
 
 @Injectable()
 export class AuthService {

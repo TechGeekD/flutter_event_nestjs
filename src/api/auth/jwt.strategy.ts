@@ -6,7 +6,7 @@ import config from "config";
 
 import { AuthService } from "./auth.service";
 
-import { IJwtPayload } from "./interfaces/jwt-payload.interface";
+import { IJwtPayload } from "./dto/login-creds.dto";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

@@ -1,10 +1,8 @@
 import { UpdateUserDTO } from "./dto/update-user.dto";
-import { CreateUserDTO } from "./dto/create-user.dto";
+import { CreateUserDTO, IUser } from "./dto/create-user.dto";
 import { Model } from "mongoose";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-
-import { IUser } from "./interfaces/user.interface";
 
 @Injectable()
 export class UserService {

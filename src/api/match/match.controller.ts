@@ -6,6 +6,7 @@ import {
 	UseGuards,
 	Get,
 	Param,
+	Query,
 } from "@nestjs/common";
 import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
@@ -18,6 +19,7 @@ import { MatchService } from "./match.service";
 import { AuthGuard } from "guard/auth.guard";
 import { RolesGuard } from "guard/roles.guard";
 import { CreateMatchResultDTO } from "./dto/create-match-result.dto";
+import { ListAllEntities } from "api/user/dto/list-all-entities.dto";
 
 @ApiUseTags("Match")
 @ApiBearerAuth()
@@ -33,17 +35,6 @@ export class MatchController {
 		createMatchDTO: CreateMatchDTO,
 	) {
 		return this.matchService.createNewMatch(createMatchDTO);
-	}
-
-	@Get()
-	@Roles(RType.ADMIN, RType.USER)
-	getAllMatch() {
-		return this.matchService.getAllMatch();
-	}
-	@Get(":id")
-	@Roles(RType.ADMIN, RType.USER)
-	getAllAllMatchById(@Param("id") eventId: string) {
-		return this.matchService.getAllMatchById(eventId);
 	}
 
 	@Post("result")
@@ -65,5 +56,32 @@ export class MatchController {
 	@Roles(RType.ADMIN, RType.USER)
 	getAllMatchResultById(@Param("id") matchId: string) {
 		return this.matchService.getAllMatchResultById(matchId);
+	}
+
+	@Get("leaderBoard")
+	@Roles(RType.ADMIN, RType.USER)
+	getGlobalLeaderBoard(@Query() query: ListAllEntities) {
+		return this.matchService.getGlobalLeaderBoard();
+	}
+
+	@Get("leaderBoard/:eventId")
+	@Roles(RType.ADMIN, RType.USER)
+	getLeaderBoardOfEvent(
+		@Param("eventId") eventId: string,
+		@Query() query: ListAllEntities,
+	) {
+		return this.matchService.getLeaderBoardOfEvent(eventId);
+	}
+
+	@Get()
+	@Roles(RType.ADMIN, RType.USER)
+	getAllMatch() {
+		return this.matchService.getAllMatch();
+	}
+
+	@Get(":id")
+	@Roles(RType.ADMIN, RType.USER)
+	getAllMatchById(@Param("id") eventId: string) {
+		return this.matchService.getAllMatchById(eventId);
 	}
 }
