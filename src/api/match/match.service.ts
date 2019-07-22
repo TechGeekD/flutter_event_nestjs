@@ -45,7 +45,19 @@ export class MatchService {
 		});
 	}
 
-	async getAllMatchById(eventId: string) {
+	async getMatchDetails(matchId: string) {
+		const matchDetails = await this.matchModel
+			.findById(matchId)
+			.populate("participantId");
+
+		if (!matchDetails) {
+			throw new NotFoundException("Error Event Match Not Found");
+		}
+
+		return matchDetails.toResponseJSON();
+	}
+
+	async getAllMatchByEventId(eventId: string) {
 		const allMatch = await this.matchModel.find({ eventId });
 
 		if (!allMatch) {

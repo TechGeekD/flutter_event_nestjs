@@ -79,9 +79,15 @@ export class MatchController {
 		return this.matchService.getAllMatch();
 	}
 
+	@Get("/event/:id")
+	@Roles(RType.ADMIN, RType.USER)
+	getAllMatchByEventId(@Param("id") eventId: string) {
+		return this.matchService.getAllMatchByEventId(eventId);
+	}
+
 	@Get(":id")
 	@Roles(RType.ADMIN, RType.USER)
-	getAllMatchById(@Param("id") eventId: string) {
-		return this.matchService.getAllMatchById(eventId);
+	getMatchDetails(@Param("id") matchId: string) {
+		return this.matchService.getMatchDetails(matchId);
 	}
 }
