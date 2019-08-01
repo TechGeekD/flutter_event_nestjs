@@ -136,35 +136,78 @@ export class MatchService {
 
 	async getGlobalLeaderBoard() {
 		const leaderBoardOfEvent = await this.matchResultModel
-			.find({ status: "win" })
-			.populate("participantId")
-			.populate("matchId")
-			.sort({ "result.value": -1 })
+			.aggregate([
+				{
+					$match: {
+						status: "win",
+					},
+				},
+			])
+			.group({
+				_id: "$participantId",
+				result: {
+					$push: "$result.value",
+				},
+				matchWon: {
+					$sum: 1,
+				},
+			})
+			.project({
+				result: 1,
+				highScore: {
+					$max: "$result",
+				},
+				matchWon: 1,
+			})
+			.sort({
+				matchWon: -1,
+				highScore: -1,
+			})
 			.collation({ locale: "en_US", numericOrdering: true });
 
 		if (!leaderBoardOfEvent) {
 			throw new NotFoundException("Error Global LeaderBoard Data Not Found");
 		}
 
-		return leaderBoardOfEvent.map(leader => {
-			return leader.toResponseJSON();
-		});
+		return leaderBoardOfEvent;
 	}
 
 	async getLeaderBoardOfEvent(eventId: string) {
 		const leaderBoardOfEvent = await this.matchResultModel
-			.find({ eventId, status: "win" })
-			.populate("participantId")
-			.populate("matchId")
-			.sort({ "result.value": -1 })
+			.aggregate([
+				{
+					$match: {
+						eventId,
+						status: "win",
+					},
+				},
+			])
+			.group({
+				_id: "$participantId",
+				result: {
+					$push: "$result.value",
+				},
+				matchWon: {
+					$sum: 1,
+				},
+			})
+			.project({
+				result: 1,
+				highScore: {
+					$max: "$result",
+				},
+				matchWon: 1,
+			})
+			.sort({
+				matchWon: -1,
+				highScore: -1,
+			})
 			.collation({ locale: "en_US", numericOrdering: true });
 
 		if (!leaderBoardOfEvent) {
 			throw new NotFoundException("Error Event LeaderBoard Data Not Found");
 		}
 
-		return leaderBoardOfEvent.map(leader => {
-			return leader.toResponseJSON();
-		});
+		return leaderBoardOfEvent;
 	}
 }
