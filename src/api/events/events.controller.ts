@@ -18,6 +18,7 @@ import { BodyExcludes } from "decorators/body-excludes.decorator";
 
 import { ListAllEntities } from "api/user/dto/list-all-entities.dto";
 import { CreateEventDTO } from "./dto/create-event.dto";
+import { EventCategoryDTO } from "./dto/event-category.dto";
 
 import { EventsService } from "./events.service";
 
@@ -30,6 +31,26 @@ import { AuthGuard } from "guard/auth.guard";
 @UseGuards(AuthGuard, RolesGuard)
 export class EventsController {
 	constructor(private readonly eventsService: EventsService) {}
+
+	@Post("category")
+	@Roles(RType.ADMIN, RType.USER)
+	createEventCategory(
+		@Body(new ValidationPipe())
+		@BodyExcludes(["createdBy"])
+		eventCategoryDTO: EventCategoryDTO,
+		@CurrentUser("id") currentUserId: string,
+	) {
+		return this.eventsService.createEventCategory(
+			eventCategoryDTO,
+			currentUserId,
+		);
+	}
+
+	@Get("category")
+	@Roles(RType.ADMIN, RType.USER)
+	getEventCategory() {
+		return this.eventsService.getEventCategory();
+	}
 
 	@Post()
 	@Roles(RType.ADMIN, RType.USER)
@@ -44,7 +65,10 @@ export class EventsController {
 
 	@Get()
 	@Roles(RType.ADMIN, RType.USER)
-	findAll(@Query() query: ListAllEntities, @CurrentUser("id") createdBy: string) {
+	findAll(
+		@Query() query: ListAllEntities,
+		@CurrentUser("id") createdBy: string,
+	) {
 		return this.eventsService.getAllEvent(createdBy);
 	}
 
@@ -67,8 +91,10 @@ export class EventsController {
 	@Roles(RType.ADMIN, RType.USER)
 	update(
 		@Param("id") id: string,
-		@BodyExcludes(["createdBy"]) updateEventDTO: CreateEventDTO,
-		@CurrentUser("id") createdBy,
+		@Body(new ValidationPipe({ skipMissingProperties: true }))
+		@BodyExcludes(["createdBy"])
+		updateEventDTO: CreateEventDTO,
+		@CurrentUser("id") createdBy: string,
 	) {
 		return this.eventsService.updateEvent(id, updateEventDTO, createdBy);
 	}

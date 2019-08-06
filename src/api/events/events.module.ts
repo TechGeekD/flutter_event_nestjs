@@ -6,6 +6,7 @@ import { EventsService } from "./events.service";
 
 import { EventsSchema } from "./schemas/events.schema";
 import { EventParticipantSchema } from "./schemas/event-participant.schema";
+import { EventCategorySchema } from "./schemas/event-category.schema";
 
 import { UserModule } from "api/user/user.module";
 
@@ -14,6 +15,7 @@ import { UserModule } from "api/user/user.module";
 		MongooseModule.forFeature([
 			{ name: "Event", schema: EventsSchema },
 			{ name: "EventParticipant", schema: EventParticipantSchema },
+			{ name: "EventCategory", schema: EventCategorySchema },
 		]),
 		UserModule,
 	],

@@ -146,7 +146,11 @@ export class MatchService {
 			.group({
 				_id: "$participantId",
 				result: {
-					$push: "$result.value",
+					$push: {
+						matchId: "$matchId",
+						eventId: "$eventId",
+						value: "$result.value",
+					},
 				},
 				matchWon: {
 					$sum: 1,
@@ -155,7 +159,7 @@ export class MatchService {
 			.project({
 				result: 1,
 				highScore: {
-					$max: "$result",
+					$max: "$result.value",
 				},
 				matchWon: 1,
 			})
@@ -185,7 +189,11 @@ export class MatchService {
 			.group({
 				_id: "$participantId",
 				result: {
-					$push: "$result.value",
+					$push: {
+						matchId: "$matchId",
+						eventId: "$eventId",
+						value: "$result.value",
+					},
 				},
 				matchWon: {
 					$sum: 1,
@@ -194,7 +202,7 @@ export class MatchService {
 			.project({
 				result: 1,
 				highScore: {
-					$max: "$result",
+					$max: "$result.value",
 				},
 				matchWon: 1,
 			})

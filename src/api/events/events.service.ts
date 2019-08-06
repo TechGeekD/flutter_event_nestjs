@@ -1,4 +1,3 @@
-
 import { Model, Types } from "mongoose";
 import {
 	Injectable,
@@ -8,7 +7,11 @@ import {
 import { InjectModel } from "@nestjs/mongoose";
 
 import { CreateEventDTO, IEvents } from "./dto/create-event.dto";
-import { EventParticipateDTO, IEventParticipant } from "./dto/event-participate.dto";
+import {
+	EventParticipateDTO,
+	IEventParticipant,
+} from "./dto/event-participate.dto";
+import { IEventCategory, EventCategoryDTO } from "./dto/event-category.dto";
 
 import { ListAllEntities } from "api/user/dto/list-all-entities.dto";
 
@@ -19,13 +22,24 @@ export class EventsService {
 		@InjectModel("Event") private readonly eventsModel: Model<IEvents>,
 		@InjectModel("EventParticipant")
 		private readonly eventParticipantModel: Model<IEventParticipant>,
+		@InjectModel("EventCategory")
+		private readonly eventCategoryModel: Model<IEventCategory>,
 	) {}
 
-	async createNewEvent(id, createEventDTO: CreateEventDTO) {
-		const createdEvent = new this.eventsModel(createEventDTO);
-		id = await this.usersModel.findById(id);
-		const eventJSON = createdEvent.toResponseJSON(id);
+	async createNewEvent(currentUserId: string, createEventDTO: CreateEventDTO) {
+		const createdById = await this.usersModel.findById(currentUserId);
+		const categoryId = await this.eventCategoryModel.findById(
+			createEventDTO.category,
+		);
+
+		const createdEvent = new this.eventsModel({
+			...createEventDTO,
+			createdBy: createdById,
+			category: categoryId,
+		});
 		await createdEvent.save();
+
+		const eventJSON = createdEvent.toResponseJSON();
 
 		return eventJSON;
 	}
@@ -34,6 +48,7 @@ export class EventsService {
 		const allEvents = await this.eventsModel
 			.find({ createdBy: { $ne: createdBy } })
 			.populate("createdBy")
+			.populate("category")
 			.sort({ createdAt: -1 });
 
 		return allEvents.map(event => {
@@ -44,6 +59,7 @@ export class EventsService {
 	async getAllEventsByUser(createdBy: string) {
 		const allEvents = await this.eventsModel
 			.find({ createdBy })
+			.populate("category")
 			.populate("createdBy");
 
 		if (!allEvents) {
@@ -60,6 +76,7 @@ export class EventsService {
 			.findOne({
 				email: userCreds.email,
 			})
+			.populate("category")
 			.populate("createdBy");
 
 		if (!foundEvent) {
@@ -72,6 +89,7 @@ export class EventsService {
 	async getEventById(id: string) {
 		const foundEvent = await this.eventsModel
 			.findById(id)
+			.populate("category")
 			.populate("createdBy");
 
 		if (!foundEvent) {
@@ -83,13 +101,14 @@ export class EventsService {
 
 	async updateEvent(
 		id: string,
-		createEventDTO: CreateEventDTO,
+		updateEventDTO: CreateEventDTO,
 		createdBy: string,
 	) {
 		const updatedEvent = await this.eventsModel
-			.findOneAndUpdate({ _id: id, createdBy }, createEventDTO, {
+			.findOneAndUpdate({ _id: id, createdBy }, updateEventDTO, {
 				new: true,
 			})
+			.populate("category")
 			.populate("createdBy");
 
 		if (!updatedEvent) {
@@ -102,6 +121,7 @@ export class EventsService {
 	async deleteEvent(id: string, createdBy: string) {
 		const deletedEvent = await this.eventsModel
 			.findOneAndDelete({ _id: id, createdBy })
+			.populate("category")
 			.populate("createdBy");
 
 		if (!deletedEvent) {
@@ -128,9 +148,14 @@ export class EventsService {
 			const populatedParticipant = await savedParticipant
 				.populate({
 					path: "eventId",
-					populate: {
-						path: "createdBy",
-					},
+					populate: [
+						{
+							path: "category",
+						},
+						{
+							path: "createdBy",
+						},
+					],
 				})
 				.populate("participantId")
 				.execPopulate();
@@ -273,5 +298,38 @@ export class EventsService {
 		}
 
 		return allParticipatedEvent[0];
+	}
+
+	async createEventCategory(
+		eventCategoryDTO: EventCategoryDTO,
+		currentUser: string,
+	) {
+		const existCategory = await this.eventCategoryModel.findOne({
+			category: eventCategoryDTO.category,
+		});
+
+		if (existCategory) {
+			throw new ConflictException("Category Already Exist");
+		}
+
+		const currentUserId = await this.usersModel.findById(currentUser);
+
+		const createdEventCategory = new this.eventCategoryModel({
+			...eventCategoryDTO,
+			createdBy: currentUserId,
+		});
+		await createdEventCategory.save();
+
+		const eventCategoryJSON = createdEventCategory.toResponseJSON();
+
+		return eventCategoryJSON;
+	}
+
+	async getEventCategory() {
+		const allEventCategory = await this.eventCategoryModel.find();
+
+		return allEventCategory.map(eventCategory => {
+			return eventCategory.toResponseJSON();
+		});
 	}
 }

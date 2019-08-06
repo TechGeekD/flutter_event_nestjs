@@ -3,7 +3,11 @@ import * as mongoose from "mongoose";
 export const EventsSchema = new mongoose.Schema(
 	{
 		title: { type: String, required: true },
-		category: { type: String, required: true },
+		category: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "EventCategory",
+			required: true,
+		},
 		description: String,
 		secret: String,
 		email: String,
@@ -24,14 +28,13 @@ export const EventsSchema = new mongoose.Schema(
 );
 
 EventsSchema.methods.toResponseJSON = function(createdBy = null) {
-	if (createdBy) {
-		this.createdBy = createdBy;
-	}
-
 	return {
 		id: this._id,
 		title: this.title,
-		category: this.category,
+		category:
+			this.category && this.category.toResponseJSON !== undefined
+				? this.category.toResponseJSON()
+				: this.category,
 		description: this.description,
 		email: this.email,
 		phoneNo: this.phoneNo,
