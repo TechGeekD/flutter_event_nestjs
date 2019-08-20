@@ -28,14 +28,10 @@ export class EventsService {
 
 	async createNewEvent(currentUserId: string, createEventDTO: CreateEventDTO) {
 		const createdById = await this.usersModel.findById(currentUserId);
-		const categoryId = await this.eventCategoryModel.findById(
-			createEventDTO.category,
-		);
 
 		const createdEvent = new this.eventsModel({
 			...createEventDTO,
 			createdBy: createdById,
-			category: categoryId,
 		});
 		await createdEvent.save();
 
@@ -48,7 +44,6 @@ export class EventsService {
 		const allEvents = await this.eventsModel
 			.find({ createdBy: { $ne: createdBy } })
 			.populate("createdBy")
-			.populate("category")
 			.sort({ createdAt: -1 });
 
 		return allEvents.map(event => {
@@ -59,7 +54,6 @@ export class EventsService {
 	async getAllEventsByUser(createdBy: string) {
 		const allEvents = await this.eventsModel
 			.find({ createdBy })
-			.populate("category")
 			.populate("createdBy");
 
 		if (!allEvents) {
@@ -76,7 +70,6 @@ export class EventsService {
 			.findOne({
 				email: userCreds.email,
 			})
-			.populate("category")
 			.populate("createdBy");
 
 		if (!foundEvent) {
@@ -89,7 +82,6 @@ export class EventsService {
 	async getEventById(id: string) {
 		const foundEvent = await this.eventsModel
 			.findById(id)
-			.populate("category")
 			.populate("createdBy");
 
 		if (!foundEvent) {
@@ -108,7 +100,6 @@ export class EventsService {
 			.findOneAndUpdate({ _id: id, createdBy }, updateEventDTO, {
 				new: true,
 			})
-			.populate("category")
 			.populate("createdBy");
 
 		if (!updatedEvent) {
@@ -121,7 +112,6 @@ export class EventsService {
 	async deleteEvent(id: string, createdBy: string) {
 		const deletedEvent = await this.eventsModel
 			.findOneAndDelete({ _id: id, createdBy })
-			.populate("category")
 			.populate("createdBy");
 
 		if (!deletedEvent) {
@@ -149,9 +139,6 @@ export class EventsService {
 				.populate({
 					path: "eventId",
 					populate: [
-						{
-							path: "category",
-						},
 						{
 							path: "createdBy",
 						},

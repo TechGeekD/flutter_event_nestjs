@@ -27,12 +27,12 @@ export const EventsSchema = new mongoose.Schema(
 	},
 );
 
-EventsSchema.methods.toResponseJSON = function(createdBy = null) {
+EventsSchema.methods.toResponseJSON = function(mapCategory: boolean = false) {
 	return {
 		id: this._id,
 		title: this.title,
 		category:
-			this.category && this.category.toResponseJSON !== undefined
+			this.category && this.category.toResponseJSON !== undefined && mapCategory
 				? this.category.toResponseJSON()
 				: this.category,
 		description: this.description,
