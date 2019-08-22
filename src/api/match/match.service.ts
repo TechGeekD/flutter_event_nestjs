@@ -156,11 +156,31 @@ export class MatchService {
 					$sum: 1,
 				},
 			})
+			.lookup({
+				from: "users",
+				localField: "_id",
+				foreignField: "_id",
+				as: "participant",
+			})
+			.unwind("$participant")
+			.project({
+				participant: {
+					_id: 0,
+					__v: 0,
+					createdAt: 0,
+					updatedAt: 0,
+					roles: 0,
+					salt: 0,
+					password: 0,
+					token: 0,
+				},
+			})
 			.project({
 				result: 1,
 				highScore: {
 					$max: "$result.value",
 				},
+				participant: 1,
 				matchWon: 1,
 			})
 			.sort({
