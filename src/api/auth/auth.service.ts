@@ -30,7 +30,10 @@ export class AuthService {
 	async AuthenticateUser(userCreds: LoginCredsDTO) {
 		const authUser: IUser = await this.userModel
 			.findOne({
-				$or: [{ username: userCreds.username }, { email: userCreds.email }],
+				$or: [
+					{ username: new RegExp(userCreds.username, "i") },
+					{ email: new RegExp(userCreds.email, "i") },
+				],
 			})
 			.populate("roles");
 

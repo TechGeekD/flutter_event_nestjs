@@ -6,8 +6,10 @@ import {
 	MinLength,
 	IsPhoneNumber,
 	IsDateString,
+	ValidateNested,
 } from "class-validator";
 import { Document } from "mongoose";
+import { Type } from "class-transformer";
 
 export interface IEvents extends Document {
 	title: string;
@@ -19,11 +21,24 @@ export interface IEvents extends Document {
 	address?: string;
 	mode: string;
 	cost: string;
-	createdBy: string;
+	createdBy?: string;
 	date: string;
 	toResponseJSON?(id?): any;
 }
 
+export class EventDateDTO {
+	@IsString()
+	@IsDateString()
+	@ApiModelProperty()
+	start: string;
+
+	@IsString()
+	@IsDateString()
+	@ApiModelProperty()
+	end: string;
+}
+
+// tslint:disable-next-line:max-classes-per-file
 export class CreateEventDTO {
 	@IsString()
 	@ApiModelProperty()
@@ -67,11 +82,12 @@ export class CreateEventDTO {
 	@ApiModelProperty()
 	readonly cost: string;
 
-	@ApiModelProperty()
+	@IsOptional()
+	@IsString()
 	readonly createdBy: string;
 
-	@IsString()
-	@IsDateString()
+	@ValidateNested()
 	@ApiModelProperty()
-	readonly date: string;
+	@Type(() => EventDateDTO)
+	readonly date: EventDateDTO;
 }

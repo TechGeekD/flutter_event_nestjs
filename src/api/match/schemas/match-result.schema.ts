@@ -4,7 +4,7 @@ export const MatchResultSchema = new mongoose.Schema(
 	{
 		participantId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "User",
+			ref: "Team",
 			required: true,
 		},
 		eventId: {
@@ -20,7 +20,21 @@ export const MatchResultSchema = new mongoose.Schema(
 		result: {
 			displayName: String,
 			value: String,
+			extraValues: mongoose.Schema.Types.Mixed,
 		},
+		teamMemberResult: [
+			{
+				displayName: String,
+				member: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "User",
+					required: true,
+				},
+				memberType: String,
+				value: String,
+				extraValues: mongoose.Schema.Types.Mixed,
+			},
+		],
 		status: String,
 	},
 	{
@@ -32,8 +46,8 @@ MatchResultSchema.methods.toResponseJSON = function() {
 	return {
 		id: this._id,
 		participantId:
-			this.participantId.toProfileJSON !== undefined
-				? this.participantId.toProfileJSON()
+			this.participantId.toResponseJSON !== undefined
+				? this.participantId.toResponseJSON()
 				: this.participantId,
 		eventId:
 			this.eventId.toResponseJSON !== undefined
@@ -44,6 +58,13 @@ MatchResultSchema.methods.toResponseJSON = function() {
 				? this.matchId.toResponseJSON()
 				: this.matchId,
 		result: this.result,
+		teamMemberResult: this.teamMemberResult.map(result => {
+			result.member =
+				result.member.toProfileJSON !== undefined
+					? result.member.toProfileJSON()
+					: result.member;
+			return result;
+		}),
 		status: this.status,
 	};
 };

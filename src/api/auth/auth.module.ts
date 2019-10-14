@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { PassportModule } from "@nestjs/passport";
 import { JwtModule } from "@nestjs/jwt";
 
@@ -21,8 +21,8 @@ import { EventsModule } from "api/events/events.module";
 				expiresIn: 3600,
 			},
 		}),
-		UserModule,
-		EventsModule,
+		forwardRef(() => UserModule),
+		forwardRef(() => EventsModule),
 	],
 	controllers: [AuthController],
 	providers: [AuthService, JwtStrategy],

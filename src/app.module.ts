@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -13,9 +13,10 @@ import config from "config";
 			useFindAndModify: false,
 			useNewUrlParser: true,
 			useCreateIndex: true,
+			useUnifiedTopology: true,
 		}),
-		AuthModule,
-		MatchModule,
+		forwardRef(() => AuthModule),
+		forwardRef(() => MatchModule),
 	],
 	controllers: [AppController],
 	providers: [AppService],

@@ -20,7 +20,10 @@ export const EventsSchema = new mongoose.Schema(
 			ref: "User",
 			required: true,
 		},
-		date: { type: String, required: true },
+		date: {
+			start: { type: String, required: true },
+			end: { type: String, required: true },
+		},
 	},
 	{
 		timestamps: true,

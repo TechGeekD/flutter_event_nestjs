@@ -13,10 +13,11 @@ export const MatchSchema = new mongoose.Schema(
 		participantId: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
-				ref: "User",
+				ref: "Team",
 				required: true,
 			},
 		],
+		matchType: { type: String, required: true },
 	},
 	{
 		timestamps: true,
@@ -32,9 +33,12 @@ MatchSchema.methods.toResponseJSON = function() {
 				: this.eventId,
 		match: this.match,
 		note: this.note,
-		participantId: this.participantId.map(e =>
-			e.toProfileJSON !== undefined ? e.toProfileJSON() : e,
+		participantId: this.participantId.map(participant =>
+			participant.toResponseJSON !== undefined
+				? participant.toResponseJSON()
+				: participant,
 		),
 		date: this.date,
+		matchType: this.matchType,
 	};
 };

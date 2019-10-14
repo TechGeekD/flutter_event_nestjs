@@ -7,18 +7,22 @@ import {
 	Get,
 	Param,
 	Query,
+	Put,
 } from "@nestjs/common";
 import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
 import { Roles, RType } from "decorators/roles.decorator";
 
-import { CreateMatchDTO } from "./dto/create-match.dto";
+import { CreateMatchDTO, UpdateMatchDTO } from "./dto/create-match.dto";
 
 import { MatchService } from "./match.service";
 
 import { AuthGuard } from "guard/auth.guard";
 import { RolesGuard } from "guard/roles.guard";
-import { CreateMatchResultDTO } from "./dto/create-match-result.dto";
+import {
+	CreateMatchResultDTO,
+	UpdateMatchResultDTO,
+} from "./dto/create-match-result.dto";
 import { ListAllEntities } from "api/user/dto/list-all-entities.dto";
 
 @ApiUseTags("Match")
@@ -27,15 +31,6 @@ import { ListAllEntities } from "api/user/dto/list-all-entities.dto";
 @UseGuards(AuthGuard, RolesGuard)
 export class MatchController {
 	constructor(private readonly matchService: MatchService) {}
-
-	@Post()
-	@Roles(RType.ADMIN, RType.USER)
-	createMatch(
-		@Body(new ValidationPipe())
-		createMatchDTO: CreateMatchDTO,
-	) {
-		return this.matchService.createNewMatch(createMatchDTO);
-	}
 
 	@Post("result")
 	@Roles(RType.ADMIN, RType.USER)
@@ -46,16 +41,32 @@ export class MatchController {
 		return this.matchService.createNewMatchResult(createMatchResultDTO);
 	}
 
+	@Put("result/:resultId")
+	@Roles(RType.ADMIN, RType.USER)
+	updateMatchResult(
+		@Param("resultId") resultId: string,
+		@Body(new ValidationPipe())
+		createMatchResultDTO: UpdateMatchResultDTO,
+	) {
+		return this.matchService.updateMatchResult(resultId, createMatchResultDTO);
+	}
+
 	@Get("result")
 	@Roles(RType.ADMIN, RType.USER)
 	getAllMatchResult() {
 		return this.matchService.getAllMatchResult();
 	}
 
-	@Get("result/:id")
+	@Get("result/:resultId")
 	@Roles(RType.ADMIN, RType.USER)
-	getAllMatchResultById(@Param("id") matchId: string) {
-		return this.matchService.getAllMatchResultById(matchId);
+	getAllMatchResultById(@Param("resultId") resultId: string) {
+		return this.matchService.getAllMatchResultById(resultId);
+	}
+
+	@Get("result/matchId/:matchId")
+	@Roles(RType.ADMIN, RType.USER)
+	getMatchResultByMatchId(@Param("matchId") matchId: string) {
+		return this.matchService.getMatchResultByMatchId(matchId);
 	}
 
 	@Get("leaderBoard")
@@ -73,21 +84,40 @@ export class MatchController {
 		return this.matchService.getLeaderBoardOfEvent(eventId);
 	}
 
+	@Get("event/:eventId")
+	@Roles(RType.ADMIN, RType.USER)
+	getAllMatchByEventId(@Param("eventId") eventId: string) {
+		return this.matchService.getAllMatchByEventId(eventId);
+	}
+
+	@Post()
+	@Roles(RType.ADMIN, RType.USER)
+	createMatch(
+		@Body(new ValidationPipe())
+		createMatchDTO: CreateMatchDTO,
+	) {
+		return this.matchService.createNewMatch(createMatchDTO);
+	}
+
+	@Put(":matchId")
+	@Roles(RType.ADMIN, RType.USER)
+	updateMatch(
+		@Param("matchId") matchId: string,
+		@Body(new ValidationPipe())
+		updateMatchDTO: UpdateMatchDTO,
+	) {
+		return this.matchService.updateMatch(matchId, updateMatchDTO);
+	}
+
 	@Get()
 	@Roles(RType.ADMIN, RType.USER)
 	getAllMatch() {
 		return this.matchService.getAllMatch();
 	}
 
-	@Get("/event/:id")
+	@Get(":matchId")
 	@Roles(RType.ADMIN, RType.USER)
-	getAllMatchByEventId(@Param("id") eventId: string) {
-		return this.matchService.getAllMatchByEventId(eventId);
-	}
-
-	@Get(":id")
-	@Roles(RType.ADMIN, RType.USER)
-	getMatchDetails(@Param("id") matchId: string) {
+	getMatchDetails(@Param("matchId") matchId: string) {
 		return this.matchService.getMatchDetails(matchId);
 	}
 }

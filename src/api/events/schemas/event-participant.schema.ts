@@ -9,7 +9,7 @@ export const EventParticipantSchema = new mongoose.Schema(
 		},
 		participantId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "User",
+			ref: "Team",
 			required: true,
 		},
 	},
@@ -28,7 +28,7 @@ EventParticipantSchema.methods.toResponseJSON = function({
 	if (eventUsers) {
 		return {
 			event: this.eventId,
-			participant: this.participantId.toProfileJSON(),
+			participant: this.participantId.toResponseJSON(),
 		};
 	} else if (usersEvent) {
 		return {
@@ -38,7 +38,7 @@ EventParticipantSchema.methods.toResponseJSON = function({
 	} else {
 		return {
 			event: this.eventId.toResponseJSON(),
-			participant: this.participantId.toProfileJSON(),
+			participant: this.participantId.toResponseJSON(),
 		};
 	}
 };

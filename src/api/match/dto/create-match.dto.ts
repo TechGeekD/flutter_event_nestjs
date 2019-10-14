@@ -8,6 +8,8 @@ export interface IMatch extends Document {
 	note?: string;
 	participantId: string[];
 	date: string;
+	matchType: string;
+	result: any;
 	toResponseJSON?(): any;
 }
 
@@ -34,4 +36,45 @@ export class CreateMatchDTO {
 	@IsString({ each: true })
 	@ApiModelProperty()
 	readonly participantId: string[];
+
+	@IsString()
+	@MinLength(3)
+	@ApiModelProperty()
+	readonly matchType: string;
+}
+
+// tslint:disable-next-line:max-classes-per-file
+export class UpdateMatchDTO {
+	@IsOptional()
+	@IsString()
+	@ApiModelPropertyOptional()
+	readonly eventId: string;
+
+	@IsOptional()
+	@IsString()
+	@MinLength(3)
+	@ApiModelPropertyOptional()
+	readonly match: string;
+
+	@IsOptional()
+	@IsDateString()
+	@ApiModelPropertyOptional()
+	readonly date: string;
+
+	@IsOptional()
+	@IsString()
+	@MinLength(3)
+	@ApiModelPropertyOptional()
+	readonly note: string;
+
+	@IsOptional()
+	@IsString({ each: true })
+	@ApiModelPropertyOptional()
+	readonly participantId: string[];
+
+	@IsOptional()
+	@IsString()
+	@MinLength(3)
+	@ApiModelPropertyOptional()
+	readonly matchType: string;
 }

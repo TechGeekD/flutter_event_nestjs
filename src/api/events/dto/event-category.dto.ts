@@ -1,5 +1,5 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from "@nestjs/swagger";
-import { IsString, ValidateNested } from "class-validator";
+import { IsString, ValidateNested, IsOptional } from "class-validator";
 import { Document } from "mongoose";
 import { Type } from "class-transformer";
 
@@ -42,5 +42,7 @@ export class EventCategoryDTO {
 	@Type(() => MetaDataDTO)
 	readonly metadata: MetaDataDTO;
 
+	@IsOptional()
+	@IsString()
 	readonly createdBy: string;
 }

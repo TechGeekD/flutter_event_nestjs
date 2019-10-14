@@ -12,6 +12,8 @@ import {
 	IEventParticipant,
 } from "./dto/event-participate.dto";
 import { IEventCategory, EventCategoryDTO } from "./dto/event-category.dto";
+import { IEventResult, EventResultDTO } from "./dto/event-result.dto";
+import { IMatchResult } from "api/match/dto/create-match-result.dto";
 
 import { ListAllEntities } from "api/user/dto/list-all-entities.dto";
 
@@ -20,10 +22,14 @@ export class EventsService {
 	constructor(
 		@InjectModel("User") private readonly usersModel: Model<IEvents>,
 		@InjectModel("Event") private readonly eventsModel: Model<IEvents>,
+		@InjectModel("EventResult")
+		private readonly eventResultsModel: Model<IEventResult>,
 		@InjectModel("EventParticipant")
 		private readonly eventParticipantModel: Model<IEventParticipant>,
 		@InjectModel("EventCategory")
 		private readonly eventCategoryModel: Model<IEventCategory>,
+		@InjectModel("MatchResult")
+		private readonly matchResultModel: Model<IMatchResult>,
 	) {}
 
 	async createNewEvent(currentUserId: string, createEventDTO: CreateEventDTO) {
@@ -168,7 +174,7 @@ export class EventsService {
 			.skip(limit * page)
 			.limit(limit)
 			.lookup({
-				from: "users",
+				from: "teams",
 				localField: "participantId",
 				foreignField: "_id",
 				as: "participant",
@@ -318,5 +324,116 @@ export class EventsService {
 		return allEventCategory.map(eventCategory => {
 			return eventCategory.toResponseJSON();
 		});
+	}
+
+	async getEventLeagueTable(eventId: string) {
+		let allEventMatchResult = await this.matchResultModel
+			.aggregate([
+				{
+					$match: { eventId: Types.ObjectId(eventId) },
+				},
+			])
+			.group({
+				_id: "$participantId",
+				status: { $push: "$status" },
+				matchesPlayed: { $sum: 1 },
+			})
+			.lookup({
+				from: "teams",
+				localField: "_id",
+				foreignField: "_id",
+				as: "team",
+			})
+			.unwind("team")
+			.project({
+				status: 1,
+				teamName: "$team.teamName",
+				matchesPlayed: 1,
+			});
+
+		allEventMatchResult.forEach((e, index) => {
+			e.statusObj = {};
+			e.points = 0;
+
+			e.status.forEach((stat: string) => {
+				e.statusObj[stat] = e.statusObj[stat] ? (e.statusObj[stat] += 1) : 1;
+			});
+
+			e.recentMatches = e.status.filter((stat: string, i: number) => {
+				if (i < 3) {
+					return stat;
+				}
+			});
+
+			e.statusObj.won = e.statusObj.won ? e.statusObj.won : 0;
+			e.statusObj.lost = e.statusObj.lost ? e.statusObj.lost : 0;
+			e.statusObj.draw = e.statusObj.draw ? e.statusObj.draw : 0;
+
+			e.points += e.statusObj.won * 2 + e.statusObj.draw;
+
+			e.status = e.statusObj;
+			delete e.statusObj;
+		});
+
+		allEventMatchResult = allEventMatchResult.sort((a, b) => {
+			return Number(b.points) - Number(a.points);
+		});
+
+		return allEventMatchResult;
+	}
+
+	async getAllEventResult() {
+		const allEventResults = await this.eventResultsModel
+			.find()
+			.populate("eventId")
+			.populate("tournamentResultDetails.value");
+
+		return allEventResults.map(eventResult => {
+			return eventResult.toResponseJSON();
+		});
+	}
+
+	async getEventResultById(id: string) {
+		const eventResult = await this.eventResultsModel
+			.findById(id)
+			.populate("eventId")
+			.populate("tournamentResultDetails.value");
+
+		return eventResult.toResponseJSON();
+	}
+
+	async getEventResultByEventId(id: string) {
+		const eventResults = await this.eventResultsModel
+			.find({ eventId: id })
+			.populate("eventId")
+			.populate("tournamentResultDetails.value");
+
+		return eventResults.map(eventResult => eventResult.toResponseJSON());
+	}
+
+	async createEventResult(eventResultDTO: EventResultDTO) {
+		const existEventResult = await this.eventResultsModel.findOne({
+			$and: [
+				{
+					"tournamentResultDetails.value": {
+						$in: [
+							...eventResultDTO.tournamentResultDetails.map(trd => trd.value),
+						],
+					},
+				},
+				{ eventId: eventResultDTO.eventId },
+			],
+		});
+
+		if (existEventResult) {
+			throw new ConflictException("Result Already Exist");
+		}
+
+		const createdEventResult = new this.eventResultsModel(eventResultDTO);
+		await createdEventResult.save();
+
+		const eventResultJSON = createdEventResult.toResponseJSON();
+
+		return eventResultJSON;
 	}
 }

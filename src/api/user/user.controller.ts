@@ -8,6 +8,7 @@ import {
 	Param,
 	Query,
 	UseGuards,
+	ValidationPipe,
 } from "@nestjs/common";
 import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
@@ -23,6 +24,7 @@ import { AuthGuard } from "guard/auth.guard";
 import { RolesGuard } from "guard/roles.guard";
 
 import { UserService } from "./user.service";
+import { CreateTeamDTO, UpdateTeamDTO } from "./dto/team.dto";
 
 @ApiUseTags("Users")
 @ApiBearerAuth()
@@ -31,9 +33,57 @@ import { UserService } from "./user.service";
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
+	@Get("team/userId/:userId")
+	@Roles(RType.ADMIN, RType.USER)
+	findTeamByUserId(@Param("userId") id: string) {
+		return this.userService.getTeamByUserId(id);
+	}
+
+	@Get("team/:teamId")
+	@Roles(RType.ADMIN, RType.USER)
+	findOneTeam(@Param("teamId") id: string) {
+		return this.userService.getTeamById(id);
+	}
+
+	@Get("team")
+	@Roles(RType.ADMIN, RType.USER)
+	findAllTeam() {
+		return this.userService.getAllTeam();
+	}
+
+	@Post("team")
+	@Roles(RType.ADMIN, RType.USER)
+	createTeam(
+		@Body(new ValidationPipe()) createTeamDTO: CreateTeamDTO,
+		@CurrentUser("id") user: string,
+	) {
+		const createTeam: CreateTeamDTO = {
+			...createTeamDTO,
+			user,
+			teamMembers: [
+				...createTeamDTO.teamMembers,
+				{
+					member: user,
+					role: "captain",
+				},
+			],
+		};
+		return this.userService.createTeam(createTeam);
+	}
+
+	@Put("team/:teamId")
+	@Roles(RType.ADMIN, RType.USER)
+	updateTeam(
+		@Param("teamId") teamId: string,
+		@Body(new ValidationPipe()) updateTeamDTO: UpdateTeamDTO,
+		@CurrentUser("id") currentUserId: string,
+	) {
+		return this.userService.updateTeam(teamId, updateTeamDTO, currentUserId);
+	}
+
 	@Post()
 	@Roles(RType.ADMIN)
-	create(@Body() createUserDTO: CreateUserDTO) {
+	create(@Body(new ValidationPipe()) createUserDTO: CreateUserDTO) {
 		return this.userService.setNewUser(createUserDTO);
 	}
 
@@ -43,25 +93,25 @@ export class UserController {
 		return this.userService.getAllUser(id);
 	}
 
-	@Get(":id")
+	@Get(":userId")
 	@Roles(RType.ADMIN, RType.USER)
-	findOne(@Param("id") id: string) {
-		return this.userService.getUserById(id);
+	findOne(@Param("userId") userId: string) {
+		return this.userService.getUserById(userId);
 	}
 
-	@Put(":id")
+	@Put(":userId")
 	@Roles(RType.ADMIN)
 	update(
-		@Param("id") id: string,
+		@Param("userId") userId: string,
 		@BodyExcludes(["token", "roles", "username", "password", "email"])
 		updateUserDTO: UpdateUserDTO,
 	) {
-		return this.userService.updateUser(id, updateUserDTO);
+		return this.userService.updateUser(userId, updateUserDTO);
 	}
 
-	@Delete(":id")
+	@Delete(":userId")
 	@Roles(RType.ADMIN)
-	remove(@Param("id") id: string) {
-		return this.userService.deleteUser(id);
+	remove(@Param("userId") userId: string) {
+		return this.userService.deleteUser(userId);
 	}
 }
