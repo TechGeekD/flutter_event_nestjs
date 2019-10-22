@@ -128,32 +128,32 @@ export class UserService {
 				},
 				memberOverview: {
 					$first: {
-						"runs": {
+						runs: {
 							$sum: {
 								$toInt: "$teamMemberResult.value",
 							},
 						},
-						"balls": {
+						balls: {
 							$sum: {
 								$toInt: "$teamMemberResult.extraValues.ball",
 							},
 						},
-						"4s": {
+						the4s: {
 							$sum: {
 								$toInt: "$teamMemberResult.extraValues.4s",
 							},
 						},
-						"6s": {
+						the6s: {
 							$sum: {
 								$toInt: "$teamMemberResult.extraValues.6s",
 							},
 						},
-						"wickets": {
+						wickets: {
 							$sum: {
 								$toInt: "$teamMemberResult.extraValues.wickets",
 							},
 						},
-						"maidens": {
+						maidens: {
 							$sum: {
 								$toInt: "$teamMemberResult.extraValues.maiden",
 							},

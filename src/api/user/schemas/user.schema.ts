@@ -46,9 +46,9 @@ UserSchema.methods.setRoleAndPassword = async function(role) {
 UserSchema.methods.generateJWT = function() {
 	const jwtService = new JwtService({
 		secret: config.jwtSecret,
-		signOptions: {
-			expiresIn: 3600,
-		},
+		// signOptions: {
+		// 	expiresIn: 3600,
+		// },
 	});
 
 	return (this.token = jwtService.sign({
