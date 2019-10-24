@@ -226,11 +226,11 @@ export class MatchService {
 			const memberResult = match.teamMemberResult;
 			if (memberResult.memberType === "batsman") {
 				memberResult.extraValues.sr = String(
-					(memberResult.value / memberResult.extraValues.ball) * 100,
+					((memberResult.value / memberResult.extraValues.ball) * 100).toFixed(2),
 				);
 			} else {
 				const over: any = getOver(memberResult.extraValues.ball);
-				memberResult.extraValues.eco = String(memberResult.value / over);
+				memberResult.extraValues.eco = String((memberResult.value / over).toFixed(2));
 			}
 
 			duplicate.teamMemberResultArray.push(match.teamMemberResult);

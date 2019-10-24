@@ -127,7 +127,7 @@ export class UserService {
 					$first: "$status",
 				},
 				memberOverview: {
-					$first: {
+					$push: {
 						runs: {
 							$sum: {
 								$toInt: "$teamMemberResult.value",
@@ -181,6 +181,31 @@ export class UserService {
 					token: 0,
 				},
 			})
+			.addFields({
+				memberOverallOverview: {
+					runs: { $sum: "$memberOverview.runs" },
+					balls: { $sum: "$memberOverview.balls" },
+					wickets: { $sum: "$memberOverview.wickets" },
+					maidens: { $sum: "$memberOverview.maidens" },
+					the4s: { $sum: "$memberOverview.the4s" },
+					the6s: { $sum: "$memberOverview.the6s" },
+				},
+			})
+			.addFields({
+				memberOverallOverview: {
+					sr: {
+						$multiply: [
+							{
+								$divide: [
+									"$memberOverallOverview.runs",
+									"$memberOverallOverview.balls",
+								],
+							},
+							100,
+						],
+					},
+				},
+			})
 			.group({
 				_id: "$teamDetails._id",
 				teamDetails: { $first: "$teamDetails" },
@@ -188,7 +213,7 @@ export class UserService {
 				teamMembers: {
 					$push: {
 						details: "$member",
-						overview: "$memberOverview",
+						overview: "$memberOverallOverview",
 					},
 				},
 			})
