@@ -28,17 +28,17 @@ export class AuthService {
 	}
 
 	async AuthenticateUser(userCreds: LoginCredsDTO) {
+		const username = new RegExp(`^${userCreds.username}$`, "i");
+		const email = new RegExp(`^${userCreds.email}$`, "i");
+
 		const authUser: IUser = await this.userModel
 			.findOne({
-				$or: [
-					{ username: new RegExp(userCreds.username, "i") },
-					{ email: new RegExp(userCreds.email, "i") },
-				],
+				$or: [{ username }, { email }],
 			})
 			.populate("roles");
 
 		if (authUser) {
-			const validPassword = authUser.validatePassword(userCreds.password);
+			const validPassword = await authUser.validatePassword(userCreds.password);
 
 			if (validPassword) {
 				const userJson = authUser.toAuthJSON();

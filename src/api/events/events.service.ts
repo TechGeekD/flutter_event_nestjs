@@ -48,13 +48,57 @@ export class EventsService {
 
 	async getAllEvent(createdBy: string) {
 		const allEvents = await this.eventsModel
-			.find({ createdBy: { $ne: createdBy } })
-			.populate("createdBy")
-			.sort({ createdAt: -1 });
+			.aggregate([
+				{
+					$match: {
+						createdBy: { $ne: createdBy },
+					},
+				},
+			])
+			.lookup({
+				from: "matches",
+				localField: "_id",
+				foreignField: "eventId",
+				as: "matches",
+			})
+			.addFields({
+				id: "$_id",
+				matchDates: {
+					$map: {
+						input: "$matches",
+						as: "match",
+						in: "$$match.date",
+					},
+				},
+			})
+			.project({ matches: 0, __v: 0 })
+			.lookup({
+				from: "users",
+				localField: "createdBy",
+				foreignField: "_id",
+				as: "createdBy",
+			})
+			.unwind("createdBy")
+			.project({
+				createdBy: {
+					_id: 0,
+					__v: 0,
+					createdAt: 0,
+					updatedAt: 0,
+					roles: 0,
+					salt: 0,
+					password: 0,
+					token: 0,
+				},
+			})
+			.project({
+				_id: 0,
+			})
+			.sort({
+				createdAt: -1,
+			});
 
-		return allEvents.map(event => {
-			return event.toResponseJSON();
-		});
+		return allEvents;
 	}
 
 	async getAllEventsByUser(createdBy: string) {

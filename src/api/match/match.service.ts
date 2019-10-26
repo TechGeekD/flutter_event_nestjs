@@ -225,12 +225,12 @@ export class MatchService {
 			};
 			const memberResult = match.teamMemberResult;
 			if (memberResult.memberType === "batsman") {
-				memberResult.extraValues.sr = String(
-					((memberResult.value / memberResult.extraValues.ball) * 100).toFixed(2),
-				);
+				const sr = (memberResult.value / memberResult.extraValues.ball) * 100;
+				memberResult.extraValues.sr = String(sr.toFixed(2));
 			} else {
 				const over: any = getOver(memberResult.extraValues.ball);
-				memberResult.extraValues.eco = String((memberResult.value / over).toFixed(2));
+				const eco = memberResult.value / over;
+				memberResult.extraValues.eco = String(eco.toFixed(2));
 			}
 
 			duplicate.teamMemberResultArray.push(match.teamMemberResult);
@@ -254,6 +254,7 @@ export class MatchService {
 
 					duplicateObj[key].matchId = matchResults._id;
 
+					duplicateObj[key].note = matchDetails.note;
 					matchResultJSON.push(duplicateObj[key]);
 				}
 			});
