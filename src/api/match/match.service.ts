@@ -254,13 +254,22 @@ export class MatchService {
 
 					duplicateObj[key].matchId = matchResults._id;
 
-					duplicateObj[key].note = matchDetails.note;
 					matchResultJSON.push(duplicateObj[key]);
 				}
 			});
 		});
 
-		return matchResultJSON;
+		const matchJson = {
+			details: {
+				matchId: matchDetails.id,
+				note: matchDetails.note,
+				match: matchDetails.match,
+				date: matchDetails.date,
+			},
+			result: matchResultJSON,
+		};
+
+		return matchJson;
 	}
 
 	async getAllMatchByEventId(eventId: string) {
