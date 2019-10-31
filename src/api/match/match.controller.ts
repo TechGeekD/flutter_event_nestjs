@@ -24,6 +24,7 @@ import {
 	UpdateMatchResultDTO,
 } from "./dto/create-match-result.dto";
 import { ListAllEntities } from "api/user/dto/list-all-entities.dto";
+import { MatchQuery } from "./dto/match-query.dto";
 
 @ApiUseTags("Match")
 @ApiBearerAuth()
@@ -86,8 +87,8 @@ export class MatchController {
 
 	@Get("event/:eventId")
 	@Roles(RType.ADMIN, RType.USER)
-	getAllMatchByEventId(@Param("eventId") eventId: string) {
-		return this.matchService.getAllMatchByEventId(eventId);
+	getAllMatchByEventId(@Query() query: MatchQuery, @Param("eventId") eventId: string) {
+		return this.matchService.getAllMatchByEventId(eventId, query);
 	}
 
 	@Post()
@@ -111,8 +112,8 @@ export class MatchController {
 
 	@Get()
 	@Roles(RType.ADMIN, RType.USER)
-	getAllMatch() {
-		return this.matchService.getAllMatch();
+	getAllMatch(@Query() query: MatchQuery) {
+		return this.matchService.getAllMatch(query);
 	}
 
 	@Get(":matchId")

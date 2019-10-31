@@ -12,6 +12,7 @@ import {
 	IMatchResult,
 } from "./dto/create-match-result.dto";
 import { ITeam, CreateTeamDTO } from "api/user/dto/team.dto";
+import { MatchQuery } from "./dto/match-query.dto";
 
 @Injectable()
 export class MatchService {
@@ -102,8 +103,34 @@ export class MatchService {
 		return matchJSON;
 	}
 
-	async getAllMatch() {
-		const allMatch = await this.matchModel.find().populate("participantId");
+	async getAllMatch(matchQuery: MatchQuery) {
+		let query = {};
+		const matchQueryUnEsc = {
+			startDate: unescape(matchQuery.startDate).split(" ").join("T"),
+			endDate: unescape(matchQuery.endDate).split(" ").join("T"),
+			teamId: unescape(matchQuery.teamId),
+		};
+		const dateQuery = {
+			$and: [
+				{ date: { $gte: matchQueryUnEsc.startDate } },
+				{ date: { $lte: matchQueryUnEsc.endDate } },
+			],
+		};
+		const participantIdQuery = { participantId: matchQueryUnEsc.teamId };
+
+		if (matchQuery.startDate && matchQuery.teamId) {
+			query = {
+				$and: [dateQuery, participantIdQuery],
+			};
+		} else if (!matchQuery.startDate && matchQuery.teamId) {
+			query = participantIdQuery;
+		} else if (matchQuery.startDate && !matchQuery.teamId) {
+			query = dateQuery;
+		}
+
+		const allMatch = await this.matchModel
+			.find(query)
+			.populate("participantId");
 		const matchResult = await this.matchResultModel.find({
 			matchId: { $in: allMatch.map(match => match.id) },
 		});
@@ -272,9 +299,33 @@ export class MatchService {
 		return matchJson;
 	}
 
-	async getAllMatchByEventId(eventId: string) {
+	async getAllMatchByEventId(eventId: string, matchQuery: MatchQuery) {
+		let query = {};
+		const matchQueryUnEsc = {
+			startDate: unescape(matchQuery.startDate).split(" ").join("T"),
+			endDate: unescape(matchQuery.endDate).split(" ").join("T"),
+			teamId: unescape(matchQuery.teamId),
+		};
+		const dateQuery = {
+			$and: [
+				{ date: { $gte: matchQueryUnEsc.startDate } },
+				{ date: { $lte: matchQueryUnEsc.endDate } },
+			],
+		};
+		const participantIdQuery = { participantId: matchQueryUnEsc.teamId };
+
+		if (matchQuery.startDate && matchQuery.teamId) {
+			query = {
+				$and: [dateQuery, participantIdQuery],
+			};
+		} else if (!matchQuery.startDate && matchQuery.teamId) {
+			query = participantIdQuery;
+		} else if (matchQuery.startDate && !matchQuery.teamId) {
+			query = dateQuery;
+		}
+
 		const allMatch = await this.matchModel
-			.find({ eventId })
+			.find(query)
 			.populate("participantId");
 		const matchResult = await this.matchResultModel.find({
 			matchId: { $in: allMatch.map(match => match.id) },
