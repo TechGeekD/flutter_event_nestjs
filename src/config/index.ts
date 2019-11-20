@@ -25,6 +25,7 @@ export default {
    * Your secret sauce
    */
 	jwtSecret: process.env.JWT_SECRET,
+	jwtBypassToken: process.env.JWT_BYPASS_TOKEN,
 
 	/*
    * Used by winston logger

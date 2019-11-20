@@ -257,11 +257,23 @@ export class MatchService {
 			};
 			const memberResult = match.teamMemberResult;
 			if (memberResult.memberType === "batsman") {
-				const sr = (memberResult.value / memberResult.extraValues.ball) * 100;
+				const runs = Number(memberResult.value);
+				const balls = Number(memberResult.extraValues.ball);
+				let sr = 0.0;
+				if (runs && balls) {
+					sr =
+						(Number(memberResult.value) /
+							Number(memberResult.extraValues.ball)) *
+						100;
+				}
 				memberResult.extraValues.sr = String(sr.toFixed(2));
 			} else {
-				const over: any = getOver(memberResult.extraValues.ball);
-				const eco = memberResult.value / over;
+				const balls = Number(memberResult.extraValues.ball);
+				let over: any = 0;
+				if (balls) {
+					over = getOver(balls);
+				}
+				const eco = Number(memberResult.value) / over;
 				memberResult.extraValues.eco = String(eco.toFixed(2));
 			}
 

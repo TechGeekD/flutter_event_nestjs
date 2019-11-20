@@ -126,40 +126,90 @@ export class UserService {
 				status: {
 					$first: "$status",
 				},
-				memberOverview: {
+				// memberOverview: {
+				batsman: {
 					$push: {
-						runs: {
-							$sum: {
-								$toInt: "$teamMemberResult.value",
+						$cond: {
+							if: { $eq: ["$teamMemberResult.memberType", "batsman"] },
+							then: {
+								runs: {
+									$sum: {
+										$toInt: "$teamMemberResult.value",
+									},
+								},
+								balls: {
+									$sum: {
+										$toInt: "$teamMemberResult.extraValues.ball",
+									},
+								},
+								the4s: {
+									$sum: {
+										$toInt: "$teamMemberResult.extraValues.the4s",
+									},
+								},
+								the6s: {
+									$sum: {
+										$toInt: "$teamMemberResult.extraValues.the6s",
+									},
+								},
+								wickets: {
+									$sum: {
+										$toInt: "$teamMemberResult.extraValues.wickets",
+									},
+								},
+								maidens: {
+									$sum: {
+										$toInt: "$teamMemberResult.extraValues.maiden",
+									},
+								},
 							},
-						},
-						balls: {
-							$sum: {
-								$toInt: "$teamMemberResult.extraValues.ball",
-							},
-						},
-						the4s: {
-							$sum: {
-								$toInt: "$teamMemberResult.extraValues.the4s",
-							},
-						},
-						the6s: {
-							$sum: {
-								$toInt: "$teamMemberResult.extraValues.the6s",
-							},
-						},
-						wickets: {
-							$sum: {
-								$toInt: "$teamMemberResult.extraValues.wickets",
-							},
-						},
-						maidens: {
-							$sum: {
-								$toInt: "$teamMemberResult.extraValues.maiden",
-							},
+							else: null,
 						},
 					},
 				},
+				bowler: {
+					$push: {
+						$cond: {
+							if: {
+								$eq: ["$teamMemberResult.memberType", "bowler"],
+							},
+							then: {
+								runs: {
+									$sum: {
+										$toInt: "$teamMemberResult.value",
+									},
+								},
+								balls: {
+									$sum: {
+										$toInt: "$teamMemberResult.extraValues.ball",
+									},
+								},
+								the4s: {
+									$sum: {
+										$toInt: "$teamMemberResult.extraValues.the4s",
+									},
+								},
+								the6s: {
+									$sum: {
+										$toInt: "$teamMemberResult.extraValues.the6s",
+									},
+								},
+								wickets: {
+									$sum: {
+										$toInt: "$teamMemberResult.extraValues.wickets",
+									},
+								},
+								maidens: {
+									$sum: {
+										$toInt: "$teamMemberResult.extraValues.maiden",
+									},
+								},
+							},
+							else: null,
+						},
+					},
+				},
+				// },
 				teamDetails: { $first: "$teamDetails" },
 			})
 			.lookup({
@@ -183,36 +233,67 @@ export class UserService {
 			})
 			.addFields({
 				memberOverallOverview: {
-					runs: { $sum: "$memberOverview.runs" },
-					balls: { $sum: "$memberOverview.balls" },
-					wickets: { $sum: "$memberOverview.wickets" },
-					maidens: { $sum: "$memberOverview.maidens" },
-					the4s: { $sum: "$memberOverview.the4s" },
-					the6s: { $sum: "$memberOverview.the6s" },
+					batsman: {
+						runs: { $sum: "$batsman.runs" },
+						balls: { $sum: "$batsman.balls" },
+						wickets: { $sum: "$batsman.wickets" },
+						maidens: { $sum: "$batsman.maidens" },
+						the4s: { $sum: "$batsman.the4s" },
+						the6s: { $sum: "$batsman.the6s" },
+					},
+					bowler: {
+						runs: { $sum: "$bowler.runs" },
+						balls: { $sum: "$bowler.balls" },
+						wickets: { $sum: "$bowler.wickets" },
+						maidens: { $sum: "$bowler.maidens" },
+						the4s: { $sum: "$bowler.the4s" },
+						the6s: { $sum: "$bowler.the6s" },
+					},
 				},
 			})
 			.addFields({
 				memberOverallOverview: {
-					sr: {
-						$cond: {
-							if: {
-								$and: [
-									{ $gt: ["$memberOverallOverview.runs", 0] },
-									{ $gt: ["$memberOverallOverview.balls", 0] },
-								],
+					batsman: {
+						sr: {
+							$cond: {
+								if: {
+									$and: [
+										{ $gt: ["$memberOverallOverview.batsman.runs", 0] },
+										{ $gt: ["$memberOverallOverview.batsman.balls", 0] },
+									],
+								},
+								then: {
+									$multiply: [
+										{
+											$divide: [
+												"$memberOverallOverview.batsman.runs",
+												"$memberOverallOverview.batsman.balls",
+											],
+										},
+										100,
+									],
+								},
+								else: 0,
 							},
-							then: {
-								$multiply: [
-									{
-										$divide: [
-											"$memberOverallOverview.runs",
-											"$memberOverallOverview.balls",
-										],
-									},
-									100,
-								],
+						},
+					},
+					bowler: {
+						eco: {
+							$cond: {
+								if: {
+									$and: [
+										{ $gt: ["$memberOverallOverview.bowler.runs", 0] },
+										{ $gt: ["$memberOverallOverview.bowler.balls", 0] },
+									],
+								},
+								then: {
+									$divide: [
+										"$memberOverallOverview.bowler.runs",
+										"$memberOverallOverview.bowler.balls",
+									],
+								},
+								else: 0,
 							},
-							else: 0,
 						},
 					},
 				},
