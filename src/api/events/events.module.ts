@@ -9,8 +9,8 @@ import { EventParticipantSchema } from "./schemas/event-participant.schema";
 import { EventResultSchema } from "./schemas/event-result.schema";
 import { EventCategorySchema } from "./schemas/event-category.schema";
 
-import { UserModule } from "api/user/user.module";
-import { MatchModule } from "api/match/match.module";
+import { UserModule } from "../user/user.module";
+import { MatchModule } from "../match/match.module";
 
 @Module({
 	imports: [

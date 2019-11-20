@@ -11,7 +11,7 @@ import {
 	UpdateMatchResultDTO,
 	IMatchResult,
 } from "./dto/create-match-result.dto";
-import { ITeam, CreateTeamDTO } from "api/user/dto/team.dto";
+import { ITeam, CreateTeamDTO } from "../user/dto/team.dto";
 import { MatchQuery } from "./dto/match-query.dto";
 
 @Injectable()
@@ -106,8 +106,12 @@ export class MatchService {
 	async getAllMatch(matchQuery: MatchQuery) {
 		let query = {};
 		const matchQueryUnEsc = {
-			startDate: unescape(matchQuery.startDate).split(" ").join("T"),
-			endDate: unescape(matchQuery.endDate).split(" ").join("T"),
+			startDate: unescape(matchQuery.startDate)
+				.split(" ")
+				.join("T"),
+			endDate: unescape(matchQuery.endDate)
+				.split(" ")
+				.join("T"),
 			teamId: unescape(matchQuery.teamId),
 		};
 		const dateQuery = {
@@ -172,6 +176,7 @@ export class MatchService {
 						participantId: {
 							$in: participants,
 						},
+						matchId: Types.ObjectId(matchId),
 					},
 				},
 			])
@@ -302,8 +307,12 @@ export class MatchService {
 	async getAllMatchByEventId(eventId: string, matchQuery: MatchQuery) {
 		let query = {};
 		const matchQueryUnEsc = {
-			startDate: unescape(matchQuery.startDate).split(" ").join("T"),
-			endDate: unescape(matchQuery.endDate).split(" ").join("T"),
+			startDate: unescape(matchQuery.startDate)
+				.split(" ")
+				.join("T"),
+			endDate: unescape(matchQuery.endDate)
+				.split(" ")
+				.join("T"),
 			teamId: unescape(matchQuery.teamId),
 		};
 		const dateQuery = {

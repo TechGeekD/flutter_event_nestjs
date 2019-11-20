@@ -8,7 +8,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { UpdateUserDTO } from "./dto/update-user.dto";
 import { CreateUserDTO, IUser } from "./dto/create-user.dto";
 import { ITeam, CreateTeamDTO, UpdateTeamDTO } from "./dto/team.dto";
-import { IMatchResult } from "api/match/dto/create-match-result.dto";
+import { IMatchResult } from "../match/dto/create-match-result.dto";
 
 @Injectable()
 export class UserService {
@@ -140,12 +140,12 @@ export class UserService {
 						},
 						the4s: {
 							$sum: {
-								$toInt: "$teamMemberResult.extraValues.4s",
+								$toInt: "$teamMemberResult.extraValues.the4s",
 							},
 						},
 						the6s: {
 							$sum: {
-								$toInt: "$teamMemberResult.extraValues.6s",
+								$toInt: "$teamMemberResult.extraValues.the6s",
 							},
 						},
 						wickets: {
@@ -194,15 +194,26 @@ export class UserService {
 			.addFields({
 				memberOverallOverview: {
 					sr: {
-						$multiply: [
-							{
-								$divide: [
-									"$memberOverallOverview.runs",
-									"$memberOverallOverview.balls",
+						$cond: {
+							if: {
+								$and: [
+									{ $gt: ["$memberOverallOverview.runs", 0] },
+									{ $gt: ["$memberOverallOverview.balls", 0] },
 								],
 							},
-							100,
-						],
+							then: {
+								$multiply: [
+									{
+										$divide: [
+											"$memberOverallOverview.runs",
+											"$memberOverallOverview.balls",
+										],
+									},
+									100,
+								],
+							},
+							else: 0,
+						},
 					},
 				},
 			})

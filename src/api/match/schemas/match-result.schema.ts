@@ -20,7 +20,7 @@ export const MatchResultSchema = new mongoose.Schema(
 		result: {
 			displayName: String,
 			value: String,
-			extraValues: mongoose.Schema.Types.Mixed,
+			extraValues: { extra: String, ball: String, wicket: String },
 		},
 		teamMemberResult: [
 			{
@@ -32,7 +32,15 @@ export const MatchResultSchema = new mongoose.Schema(
 				},
 				memberType: String,
 				value: String,
-				extraValues: mongoose.Schema.Types.Mixed,
+				extraValues: {
+					ball: String,
+					eco: String,
+					sr: String,
+					wickets: String,
+					maiden: String,
+					the6s: String,
+					the4s: String,
+				},
 			},
 		],
 		status: String,

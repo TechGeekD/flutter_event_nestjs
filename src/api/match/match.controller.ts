@@ -11,19 +11,19 @@ import {
 } from "@nestjs/common";
 import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
-import { Roles, RType } from "decorators/roles.decorator";
+import { Roles, RType } from "../../decorators/roles.decorator";
 
 import { CreateMatchDTO, UpdateMatchDTO } from "./dto/create-match.dto";
 
 import { MatchService } from "./match.service";
 
-import { AuthGuard } from "guard/auth.guard";
-import { RolesGuard } from "guard/roles.guard";
+import { AuthGuard } from "../../guard/auth.guard";
+import { RolesGuard } from "../../guard/roles.guard";
 import {
 	CreateMatchResultDTO,
 	UpdateMatchResultDTO,
 } from "./dto/create-match-result.dto";
-import { ListAllEntities } from "api/user/dto/list-all-entities.dto";
+import { ListAllEntities } from "../user/dto/list-all-entities.dto";
 import { MatchQuery } from "./dto/match-query.dto";
 
 @ApiUseTags("Match")
@@ -87,7 +87,10 @@ export class MatchController {
 
 	@Get("event/:eventId")
 	@Roles(RType.ADMIN, RType.USER)
-	getAllMatchByEventId(@Query() query: MatchQuery, @Param("eventId") eventId: string) {
+	getAllMatchByEventId(
+		@Query() query: MatchQuery,
+		@Param("eventId") eventId: string,
+	) {
 		return this.matchService.getAllMatchByEventId(eventId, query);
 	}
 

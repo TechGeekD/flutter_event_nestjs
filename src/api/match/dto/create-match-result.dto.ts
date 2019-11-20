@@ -1,5 +1,10 @@
 import { ApiModelPropertyOptional, ApiModelProperty } from "@nestjs/swagger";
-import { IsString, ValidateNested, IsOptional } from "class-validator";
+import {
+	IsString,
+	ValidateNested,
+	IsOptional,
+	IsNumber,
+} from "class-validator";
 import { Type } from "class-transformer";
 import { Document } from "mongoose";
 
@@ -25,6 +30,21 @@ export interface IMatchResult extends Document {
 	toResponseJSON?(): any;
 }
 
+class MatchResultExtraValues {
+	@IsString()
+	@ApiModelProperty()
+	extra: string;
+
+	@IsString()
+	@ApiModelProperty()
+	ball: string;
+
+	@IsString()
+	@ApiModelProperty()
+	wicket: string;
+}
+
+// tslint:disable-next-line: max-classes-per-file
 class MatchResultDTO {
 	@IsString()
 	@ApiModelProperty()
@@ -35,8 +55,41 @@ class MatchResultDTO {
 	value: string;
 
 	@IsOptional()
-	@ApiModelPropertyOptional()
-	extraValues: any;
+	@ValidateNested()
+	@Type(() => MatchResultExtraValues)
+	@ApiModelPropertyOptional({ type: MatchResultExtraValues })
+	extraValues: MatchResultExtraValues;
+}
+
+// tslint:disable-next-line: max-classes-per-file
+class TeamMemberExtraValues {
+	@IsString()
+	@ApiModelProperty()
+	ball: string;
+
+	@IsString()
+	@ApiModelProperty()
+	eco: string;
+
+	@IsString()
+	@ApiModelProperty()
+	sr: string;
+
+	@IsString()
+	@ApiModelProperty()
+	wickets: string;
+
+	@IsString()
+	@ApiModelProperty()
+	maiden: string;
+
+	@IsString()
+	@ApiModelProperty()
+	the6s: string;
+
+	@IsString()
+	@ApiModelProperty()
+	the4s: string;
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -58,8 +111,10 @@ class TeamMemberResultDTO {
 	readonly value: string;
 
 	@IsOptional()
-	@ApiModelPropertyOptional()
-	extraValues: any;
+	@ValidateNested()
+	@Type(() => TeamMemberExtraValues)
+	@ApiModelPropertyOptional({ type: TeamMemberExtraValues })
+	extraValues: TeamMemberExtraValues;
 }
 
 // tslint:disable-next-line:max-classes-per-file

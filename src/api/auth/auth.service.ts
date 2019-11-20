@@ -6,11 +6,11 @@ import {
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
-import { RType } from "decorators/roles.decorator";
+import { RType } from "../../decorators/roles.decorator";
 
 import { LoginCredsDTO, IJwtPayload } from "./dto/login-creds.dto";
 import { RegisterCredsDTO } from "./dto/register-creds.dto";
-import { IUser } from "api/user/dto/create-user.dto";
+import { IUser } from "../user/dto/create-user.dto";
 
 @Injectable()
 export class AuthService {

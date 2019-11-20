@@ -7,7 +7,7 @@ import { MatchService } from "./match.service";
 import { MatchSchema } from "./schemas/match.schema";
 import { MatchResultSchema } from "./schemas/match-result.schema";
 
-import { UserModule } from "api/user/user.module";
+import { UserModule } from "../user/user.module";
 
 @Module({
 	imports: [

@@ -12,19 +12,19 @@ import {
 } from "@nestjs/common";
 import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
-import { CurrentUser } from "decorators/user.decorator";
-import { Roles, RType } from "decorators/roles.decorator";
-import { BodyExcludes } from "decorators/body-excludes.decorator";
+import { CurrentUser } from "../../decorators/user.decorator";
+import { Roles, RType } from "../../decorators/roles.decorator";
+import { BodyExcludes } from "../../decorators/body-excludes.decorator";
 
-import { ListAllEntities } from "api/user/dto/list-all-entities.dto";
+import { ListAllEntities } from "../user/dto/list-all-entities.dto";
 import { CreateEventDTO } from "./dto/create-event.dto";
 import { EventCategoryDTO } from "./dto/event-category.dto";
 import { EventResultDTO } from "./dto/event-result.dto";
 
 import { EventsService } from "./events.service";
 
-import { RolesGuard } from "guard/roles.guard";
-import { AuthGuard } from "guard/auth.guard";
+import { RolesGuard } from "../../guard/roles.guard";
+import { AuthGuard } from "../../guard/auth.guard";
 
 @ApiUseTags("Events")
 @ApiBearerAuth()

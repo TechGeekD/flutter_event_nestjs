@@ -2,10 +2,10 @@ import { Module, forwardRef } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { AuthModule } from "api/auth/auth.module";
+import { AuthModule } from "./api/auth/auth.module";
 import { MatchModule } from "./api/match/match.module";
 
-import config from "config";
+import config from "./config";
 
 @Module({
 	imports: [

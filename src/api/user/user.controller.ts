@@ -12,16 +12,16 @@ import {
 } from "@nestjs/common";
 import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
-import { RType, Roles } from "decorators/roles.decorator";
-import { CurrentUser } from "decorators/user.decorator";
-import { BodyExcludes } from "decorators/body-excludes.decorator";
+import { RType, Roles } from "../../decorators/roles.decorator";
+import { CurrentUser } from "../../decorators/user.decorator";
+import { BodyExcludes } from "../../decorators/body-excludes.decorator";
 
 import { CreateUserDTO } from "./dto/create-user.dto";
 import { UpdateUserDTO } from "./dto/update-user.dto";
 import { ListAllEntities } from "./dto/list-all-entities.dto";
 
-import { AuthGuard } from "guard/auth.guard";
-import { RolesGuard } from "guard/roles.guard";
+import { AuthGuard } from "../../guard/auth.guard";
+import { RolesGuard } from "../../guard/roles.guard";
 
 import { UserService } from "./user.service";
 import { CreateTeamDTO, UpdateTeamDTO } from "./dto/team.dto";
@@ -103,6 +103,7 @@ export class UserController {
 	@Roles(RType.ADMIN)
 	update(
 		@Param("userId") userId: string,
+		@Body(new ValidationPipe({ skipMissingProperties: true }))
 		@BodyExcludes(["token", "roles", "username", "password", "email"])
 		updateUserDTO: UpdateUserDTO,
 	) {

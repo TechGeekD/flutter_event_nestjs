@@ -1,0 +1,40 @@
+org: techgeekd
+app: flutterevent
+service:
+  name: serverless-flutter-event
+
+plugins:
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+
+package:
+  exclude:
+    - .git/**
+    - src/**
+    - test/**
+    - e2e/**
+    - documentation/**
+    - .env
+    - nodemon.json
+    - README.md
+    - Procfile
+
+functions:
+  flutterevent:
+    handler: 'dist/serverless.handler'
+    environment:
+      MONGODB_URI: 'add mongodb connection URI here'
+      JWT_SECRET: 'add jwt secret here'
+      
+    events:
+      - http:
+          cors: true
+          path: '/'
+          method: any
+      - http:
+          cors: true
+          path: '{proxy+}'
+          method: any

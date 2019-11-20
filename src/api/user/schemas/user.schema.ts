@@ -3,7 +3,7 @@ import { JwtService } from "@nestjs/jwt";
 import { randomBytes } from "crypto";
 import * as argon2 from "argon2";
 
-import config from "config";
+import config from "../../../config";
 
 export const UserSchema = new mongoose.Schema(
 	{

@@ -9,6 +9,7 @@ export const TeamsSchema = new mongoose.Schema(
 		},
 		teamName: { type: String, required: true },
 		teamDesc: String,
+		logo: String,
 		teamMembers: [
 			{
 				member: {
@@ -37,6 +38,7 @@ TeamsSchema.methods.toResponseJSON = function() {
 				: this.user,
 		teamName: this.teamName,
 		teamDesc: this.teamDesc,
+		logo: this.logo,
 		teamMembers: this.teamMembers.map(team => {
 			team.member =
 				team.member.toProfileJSON !== undefined

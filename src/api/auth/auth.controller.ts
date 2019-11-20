@@ -9,17 +9,17 @@ import {
 } from "@nestjs/common";
 import { ApiUseTags, ApiBearerAuth } from "@nestjs/swagger";
 
-import { Roles, RType } from "decorators/roles.decorator";
-import { CurrentUser } from "decorators/user.decorator";
-import { BodyExcludes } from "decorators/body-excludes.decorator";
+import { Roles, RType } from "../../decorators/roles.decorator";
+import { CurrentUser } from "../../decorators/user.decorator";
+import { BodyExcludes } from "../../decorators/body-excludes.decorator";
 
 import { LoginCredsDTO } from "./dto/login-creds.dto";
 import { RegisterCredsDTO } from "./dto/register-creds.dto";
 
 import { AuthService } from "./auth.service";
 
-import { AuthGuard } from "guard/auth.guard";
-import { RolesGuard } from "guard/roles.guard";
+import { AuthGuard } from "../../guard/auth.guard";
+import { RolesGuard } from "../../guard/roles.guard";
 
 @ApiUseTags("Auth")
 @Controller("auth")

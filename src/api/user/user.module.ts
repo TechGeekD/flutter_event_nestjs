@@ -7,7 +7,7 @@ import { UserService } from "./user.service";
 import { RolesSchema } from "./schemas/roles.schema";
 import { UserSchema } from "./schemas/user.schema";
 import { TeamsSchema } from "./schemas/team.schema";
-import { MatchModule } from "api/match/match.module";
+import { MatchModule } from "../match/match.module";
 
 @Module({
 	imports: [

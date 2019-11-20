@@ -13,9 +13,9 @@ import {
 } from "./dto/event-participate.dto";
 import { IEventCategory, EventCategoryDTO } from "./dto/event-category.dto";
 import { IEventResult, EventResultDTO } from "./dto/event-result.dto";
-import { IMatchResult } from "api/match/dto/create-match-result.dto";
+import { IMatchResult } from "../match/dto/create-match-result.dto";
 
-import { ListAllEntities } from "api/user/dto/list-all-entities.dto";
+import { ListAllEntities } from "../user/dto/list-all-entities.dto";
 
 @Injectable()
 export class EventsService {
@@ -49,11 +49,11 @@ export class EventsService {
 	async getAllEvent(createdBy: string) {
 		const allEvents = await this.eventsModel
 			.aggregate([
-				{
-					$match: {
-						createdBy: { $ne: createdBy },
-					},
-				},
+				// {
+				// 	$match: {
+				// 		createdBy: { $ne: createdBy },
+				// 	},
+				// },
 			])
 			.lookup({
 				from: "matches",
@@ -98,6 +98,12 @@ export class EventsService {
 				createdAt: -1,
 			});
 
+		allEvents.forEach(event => {
+			const matchDateList = event.matchDates.map(
+				(date: any) => date.split("T")[0],
+			);
+			event.matchDates = [...new Set(matchDateList)];
+		});
 		return allEvents;
 	}
 
