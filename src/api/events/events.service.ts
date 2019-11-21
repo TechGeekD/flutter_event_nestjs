@@ -417,10 +417,13 @@ export class EventsService {
 			e.status.forEach((stat: string) => {
 				e.statusObj[stat] = e.statusObj[stat] ? (e.statusObj[stat] += 1) : 1;
 			});
+			e.recentMatches = [];
+			const reverseStatus = e.status.reverse();
+			const liveIndex = e.status.lastIndexOf("live");
 
-			e.recentMatches = e.status.filter((stat: string, i: number) => {
-				if (i < 3) {
-					return stat;
+			reverseStatus.forEach((stat: string, i: number) => {
+				if (i > liveIndex && e.recentMatches.length < 3) {
+					e.recentMatches.push(stat);
 				}
 			});
 
