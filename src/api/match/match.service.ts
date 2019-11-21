@@ -318,19 +318,27 @@ export class MatchService {
 
 	async getAllMatchByEventId(eventId: string, matchQuery: MatchQuery) {
 		let query = {};
+		let startDate: any = matchQuery.startDate ? unescape(matchQuery.startDate)
+		.split(" ")
+		.join("T") + "Z" : null;
+
+		startDate = new Date(startDate).toISOString();
+
+		let endDate: any = matchQuery.endDate ? unescape(matchQuery.endDate)
+		.split(" ")
+		.join("T") + "Z" : null;
+
+		endDate = new Date(endDate);
+
 		const matchQueryUnEsc = {
-			startDate: unescape(matchQuery.startDate)
-				.split(" ")
-				.join("T"),
-			endDate: unescape(matchQuery.endDate)
-				.split(" ")
-				.join("T"),
+			startDate,
+			endDate: new Date(endDate.setDate(endDate.getDate() + 1)).toISOString(),
 			teamId: unescape(matchQuery.teamId),
 		};
 		const dateQuery = {
 			$and: [
 				{ date: { $gte: matchQueryUnEsc.startDate } },
-				{ date: { $lte: matchQueryUnEsc.endDate } },
+				{ date: { $lt: matchQueryUnEsc.endDate } },
 			],
 		};
 		const participantIdQuery = { participantId: matchQueryUnEsc.teamId };

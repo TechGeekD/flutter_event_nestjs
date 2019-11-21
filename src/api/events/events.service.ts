@@ -386,7 +386,16 @@ export class EventsService {
 			.group({
 				_id: "$participantId",
 				status: { $push: "$status" },
-				matchesPlayed: { $sum: 1 },
+				matchesPlayed: {
+					$sum: { $cond: {
+							if: {
+								$ne: ["$status", "live"],
+							},
+							then: 1,
+							else: 0,
+						},
+					},
+				},
 			})
 			.lookup({
 				from: "teams",
