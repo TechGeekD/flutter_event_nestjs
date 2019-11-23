@@ -103,7 +103,9 @@ export class UserService {
 				{
 					$match: { participantId: Types.ObjectId(id) },
 				},
-			])
+			]).match({
+				status: { $ne: "live" }
+			})
 			.lookup({
 				from: "teams",
 				localField: "participantId",
@@ -319,9 +321,27 @@ export class UserService {
 			throw new NotFoundException("Error User Not Found");
 		}
 
+		const status = await this.matchResultModel.aggregate([
+			{
+				$match: {
+				status: {
+					$ne: "live",
+				},
+				participantId: Types.ObjectId(id)
+				}
+			}, {
+				$group: {
+					_id: "$participantId",
+					status: {
+						$push: "$status",
+					},
+				},
+			},
+		]);
+
 		teamResult.forEach(result => {
 			result.teamOverview = {};
-
+			result.status = status[0].status;
 			result.status.forEach(element => {
 				if (!(element in result.teamOverview)) {
 					result.teamOverview[element] = 0;
