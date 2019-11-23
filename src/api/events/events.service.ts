@@ -5,6 +5,8 @@ import {
 	ConflictException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
+import {firstBy} from "thenby";
+
 
 import { CreateEventDTO, IEvents } from "./dto/create-event.dto";
 import {
@@ -407,10 +409,12 @@ export class EventsService {
 			.project({
 				status: 1,
 				teamName: "$team.teamName",
+				netrr: "$team.netrr",
 				matchesPlayed: 1,
 			});
 
 		allEventMatchResult.forEach((e, index) => {
+			e.teamName = e.teamName.split("Meghwal ")[1];
 			e.statusObj = {};
 			e.points = 0;
 
@@ -437,9 +441,11 @@ export class EventsService {
 			delete e.statusObj;
 		});
 
-		allEventMatchResult = allEventMatchResult.sort((a, b) => {
+		allEventMatchResult = allEventMatchResult.sort(firstBy((a, b) => {
 			return Number(b.points) - Number(a.points);
-		});
+		}).thenBy((a, b) => {
+			return Number(b.netrr) - Number(a.netrr);
+		}));
 
 		return allEventMatchResult;
 	}

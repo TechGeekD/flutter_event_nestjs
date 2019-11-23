@@ -24,6 +24,7 @@ export const EventsSchema = new mongoose.Schema(
 			start: { type: String, required: true },
 			end: { type: String, required: true },
 		},
+		netrr: { type: String, default: "0" },
 	},
 	{
 		timestamps: true,
@@ -49,5 +50,6 @@ EventsSchema.methods.toResponseJSON = function(mapCategory: boolean = false) {
 				? this.createdBy.toProfileJSON()
 				: this.createdBy,
 		date: this.date,
+		netrr: this.netrr,
 	};
 };

@@ -273,7 +273,13 @@ export class MatchService {
 				if (balls) {
 					over = getOver(balls);
 				}
-				const eco = Number(memberResult.value) / over;
+				const runs = Number(memberResult.value);
+				let eco = 0;
+
+				if(runs > 0 && over > 0) {
+					eco = Number(memberResult.value) / over;
+				}
+
 				memberResult.extraValues.eco = String(eco.toFixed(2));
 			}
 
