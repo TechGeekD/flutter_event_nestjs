@@ -9,6 +9,7 @@ import { UpdateUserDTO } from "./dto/update-user.dto";
 import { CreateUserDTO, IUser } from "./dto/create-user.dto";
 import { ITeam, CreateTeamDTO, UpdateTeamDTO } from "./dto/team.dto";
 import { IMatchResult } from "../match/dto/create-match-result.dto";
+import { firstBy } from "thenby";
 
 @Injectable()
 export class UserService {
@@ -324,12 +325,13 @@ export class UserService {
 		const status = await this.matchResultModel.aggregate([
 			{
 				$match: {
-				status: {
-					$ne: "live",
+					status: {
+						$ne: "live",
+					},
+					participantId: Types.ObjectId(id),
 				},
-				participantId: Types.ObjectId(id)
-				}
-			}, {
+			},
+			{
 				$group: {
 					_id: "$participantId",
 					status: {
@@ -340,6 +342,19 @@ export class UserService {
 		]);
 
 		teamResult.forEach(result => {
+			result.teamMembers = result.teamMembers.sort(firstBy((a , b) => {
+				const aruns = Number(a.overview.batsman.runs);
+				const bruns = Number(b.overview.batsman.runs);
+
+				return bruns - aruns;
+
+			}).thenBy((a, b) => {
+				const aballs = Number(a.overview.batsman.balls);
+				const bballs = Number(b.overview.batsman.balls);
+
+				return aballs - bballs;
+			}));
+
 			result.teamOverview = {};
 			result.status = status[0].status;
 			result.status.forEach(element => {

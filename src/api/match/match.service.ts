@@ -1,3 +1,4 @@
+import { firstBy } from "thenby";
 import {
 	Injectable,
 	NotFoundException,
@@ -230,6 +231,18 @@ export class MatchService {
 			});
 
 		matchResults = matchResults[0];
+		matchResults.matchDetails = matchResults.matchDetails.sort(firstBy((a , b) => {
+			const aruns = Number(a.teamMemberResult.value);
+			const bruns = Number(b.teamMemberResult.value);
+
+			return bruns - aruns;
+
+		}).thenBy((a, b) => {
+			const aballs = Number(a.teamMemberResult.extraValues.ball);
+			const bballs = Number(b.teamMemberResult.extraValues.ball);
+
+			return aballs - bballs;
+		}));
 
 		const duplicateObj = {};
 		matchResults.matchDetails.forEach(match => {
